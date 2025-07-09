@@ -1,0 +1,188 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+
+:root {
+  --bg-body: #f8f9fa;
+  --text-default: #212529;
+  --bg-panel: #ffffff;
+  --text-subtle: #6c757d;
+  --border-color: #dee2e6;
+  --caret-color: #0d6efd;
+  --scrollbar-track: #e9ecef;
+  --scrollbar-thumb: #ced4da;
+  --scrollbar-thumb-hover: #adb5bd;
+  --suggestion-bg: #f8f9fa;
+  --suggestion-border: #0dcaf0;
+
+  /* Hemingway Highlight Colors */
+  --highlight-yellow: #fcf8e3;
+  --highlight-red: #f2dede;
+  --highlight-blue: #d9edf7;
+  --highlight-green: #dff0d8;
+  --highlight-purple: #e9d8f2;
+  --highlight-grammar: #d9edf7;
+
+  /* Panel Colors */
+  --panel-red: #dc3545;
+  --panel-yellow: #ffc107;
+  --panel-blue: #0dcaf0;
+  --panel-green: #198754;
+  --panel-purple: #6f42c1;
+  --panel-grammar: #0d6efd;
+}
+
+html.dark {
+  --bg-body: #212529;
+  --text-default: #f8f9fa;
+  --bg-panel: #343a40;
+  --text-subtle: #adb5bd;
+  --border-color: #495057;
+  --caret-color: #3b82f6;
+  --scrollbar-track: #2c3034;
+  --scrollbar-thumb: #495057;
+  --scrollbar-thumb-hover: #6c757d;
+  --suggestion-bg: #2c3034;
+  --suggestion-border: #3b82f6;
+
+  /* Hemingway Highlight Colors */
+  --highlight-yellow: rgba(255, 235, 59, 0.2);
+  --highlight-red: rgba(244, 67, 54, 0.2);
+  --highlight-blue: rgba(3, 169, 244, 0.2);
+  --highlight-green: rgba(76, 175, 80, 0.2);
+  --highlight-purple: rgba(156, 39, 176, 0.2);
+  --highlight-grammar: rgba(3, 169, 244, 0.2);
+
+  /* Panel Colors */
+  --panel-red: #f47174;
+  --panel-yellow: #ffe082;
+  --panel-blue: #80deea;
+  --panel-green: #a5d6a7;
+  --panel-purple: #ce93d8;
+  --panel-grammar: #80deea;
+}
+
+body {
+  font-family: 'Noto Naskh Arabic', 'Tajawal', sans-serif;
+  background-color: var(--bg-body);
+  color: var(--text-default);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Custom scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Loader animation */
+@keyframes rotation {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--text-default);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+/* Expandable suggestions panel */
+.suggestions-panel {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+}
+
+.suggestions-panel.expanded {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* Editor container and textarea styles */
+.editor-container {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  overflow: hidden;
+  background-color: var(--bg-panel);
+  transition: background-color 0.3s;
+  border-radius: 0.25rem;
+}
+
+.editor-textarea, .editor-highlights {
+  font-family: 'Noto Naskh Arabic', 'Tajawal', sans-serif;
+  overflow-y: auto;
+}
+
+.editor-highlights {
+  -webkit-text-fill-color: transparent;
+  pointer-events: none;
+}
+
+.editor-textarea {
+  outline: none;
+  caret-color: var(--caret-color);
+  color: var(--text-default);
+}
+
+.editor-textarea:focus {
+  outline: none;
+}
+
+.editor-textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor-textarea::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.editor-textarea::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+}
+
+.editor-textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Highlight styles - make sure these are the only highlight rules */
+.highlight-long-sentence {
+  background-color: var(--highlight-yellow) !important;
+}
+.highlight-very-long-sentence {
+  background-color: var(--highlight-red) !important;
+}
+.highlight-adverb {
+  background-color: var(--highlight-blue) !important;
+}
+.highlight-passive {
+  background-color: var(--highlight-green) !important;
+}
+.highlight-weak {
+  background-color: var(--highlight-purple) !important;
+}
+.highlight-grammar {
+  background-color: var(--highlight-grammar) !important;
+}
