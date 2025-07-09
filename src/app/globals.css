@@ -212,3 +212,49 @@ body {
 [data-modal] {
   z-index: 99999 !important;
 }
+
+/* Compact analysis panel styles */
+.compact-analysis-collapsed {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.compact-analysis-expanded {
+  box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .compact-analysis-expanded {
+  box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Responsive editor layout when panel is expanded */
+.compact-analysis-expanded ~ .editor-content,
+.compact-analysis-expanded ~ #editor-container {
+  padding-right: 320px;
+  transition: padding-right 0.3s ease-in-out;
+}
+
+/* Ensure backdrop doesn't interfere with scrolling */
+.compact-analysis-backdrop {
+  pointer-events: none;
+}
+
+/* Better hover states for collapsed panel */
+.compact-analysis-collapsed {
+  transition: all 0.2s ease-in-out;
+}
+
+.compact-analysis-collapsed:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+html.dark .compact-analysis-collapsed:hover {
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure the main content doesn't overlap with the expanded panel */
+.main-content-shifted {
+  padding-right: 320px;
+  transition: padding-right 0.3s ease-in-out;
+}

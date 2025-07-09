@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { TextEditor } from '@/components/TextEditor';
-import { AnalysisPanel } from '@/components/AnalysisPanel';
+import { CompactAnalysisPanel } from '@/components/CompactAnalysisPanel';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { AiWarningModal } from '@/components/AiWarningModal';
 import { TextAnalysis, GrammarSuggestion } from '@/types';
@@ -27,7 +27,7 @@ export default function Home() {
   const [translation, setTranslation] = useState('...');
   const [isLoading, setIsLoading] = useState(false);
   const [aiEnabled, setAiEnabled] = useState(false);
-  const [showAiWarning, setShowAiWarning] = useState(false); // New state for modal
+  const [showAiWarning, setShowAiWarning] = useState(false);
 
   // Handle functional updates to grammar suggestions
   const handleGrammarSuggestionsChange = (suggestionsOrUpdater: GrammarSuggestion[] | ((prev: GrammarSuggestion[]) => GrammarSuggestion[])) => {
@@ -51,19 +51,20 @@ export default function Home() {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-8">
-        <header className="relative text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">مُحسِّن النص العربي بالذكاء الاصطناعي</h1>
+      <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-body)' }}>
+        <header className="relative text-center py-8">
+          <h1 className="text-4xl font-bold mb-2">Arabic Text Enhancer with AI</h1>
           <p className="text-lg" style={{ color: 'var(--text-subtle)' }}>
-            أداة لتحليل نصوصك، تصحيحها، وترجمتها لجعلها أكثر قوة ووضوحًا.
+            A tool to analyze, correct, and translate your texts for clarity and strength.
           </p>
-          <div className="absolute top-0 left-0">
+          <div className="absolute top-8 left-8">
             <ThemeToggle />
           </div>
         </header>
 
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="w-full lg:w-3/5">
+        {/* Main editor area - with responsive padding for panel */}
+        <div className="px-8 pb-8 transition-all duration-300" id="editor-container">
+          <div className="max-w-4xl mx-auto">
             <TextEditor
               analysis={analysis}
               grammarSuggestions={grammarSuggestions}
@@ -74,37 +75,21 @@ export default function Home() {
               aiEnabled={aiEnabled}
             />
           </div>
-
-          <aside className="w-full lg:w-2/5">
-            <div className="sticky top-8">
-              <AnalysisPanel
-                analysis={analysis}
-                grammarSuggestions={grammarSuggestions}
-                translation={translation}
-                isLoading={isLoading}
-                aiEnabled={aiEnabled}
-                onToggleAi={setAiEnabled}
-                onShowAiWarning={() => setShowAiWarning(true)}
-              />
-            </div>
-          </aside>
         </div>
 
-        <div className="mt-8">
-          <div className="p-6 rounded-lg shadow-lg" style={{ backgroundColor: 'var(--bg-panel)', borderRadius: '0.25rem' }}>
-            <h2 className="text-2xl font-bold mb-4">الترجمة الفورية (إلى الإنجليزية)</h2>
-            <div
-              id="translation-output"
-              className="text-lg min-h-[50px] transition-colors duration-300"
-              style={{ color: 'var(--text-subtle)', direction: 'ltr' }}
-            >
-              {aiEnabled ? (isLoading ? 'جارٍ الترجمة...' : translation) : 'يرجى تفعيل تحليل الذكاء الاصطناعي للحصول على الترجمة'}
-            </div>
-          </div>
-        </div>
+        {/* Compact Analysis Panel */}
+        <CompactAnalysisPanel
+          analysis={analysis}
+          grammarSuggestions={grammarSuggestions}
+          translation={translation}
+          isLoading={isLoading}
+          aiEnabled={aiEnabled}
+          onToggleAi={setAiEnabled}
+          onShowAiWarning={() => setShowAiWarning(true)}
+        />
       </div>
 
-      {/* AI Warning Modal - rendered at page level, outside of all other components */}
+      {/* AI Warning Modal */}
       {showAiWarning && (
         <AiWarningModal
           onConfirm={handleAiWarningConfirm}
