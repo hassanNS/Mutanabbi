@@ -3,70 +3,81 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400..700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
 
 :root {
-  --bg-body: #f8f9fa;
-  --text-default: #212529;
+  --bg-body: #f3f4f6; /* gray-100 */
+  --text-default: #1f2937; /* gray-800 */
   --bg-panel: #ffffff;
-  --text-subtle: #6c757d;
-  --border-color: #dee2e6;
-  --caret-color: #0d6efd;
-  --scrollbar-track: #e9ecef;
-  --scrollbar-thumb: #ced4da;
-  --scrollbar-thumb-hover: #adb5bd;
-  --suggestion-bg: #f8f9fa;
-  --suggestion-border: #0dcaf0;
+  --text-subtle: #4b5563; /* gray-600 */
+  --border-color: #e5e7eb; /* gray-200 */
+  --caret-color: #f97316; /* orange-500 */
+  --scrollbar-track: #e5e7eb;
+  --scrollbar-thumb: #9ca3af;
+  --scrollbar-thumb-hover: #6b7280;
+  --suggestion-bg: #f3f4f6; /* gray-100 */
+  --suggestion-border: #fb923c; /* orange-400 */
 
-  /* Hemingway Highlight Colors */
-  --highlight-yellow: #fcf8e3;
-  --highlight-red: #f2dede;
-  --highlight-blue: #d9edf7;
-  --highlight-green: #dff0d8;
-  --highlight-purple: #e9d8f2;
-  --highlight-grammar: #d9edf7;
+  /* Highlight colors for the text editor */
+  --highlight-grammar: #fb923c; /* Deep orange for clear distinction */
+  --highlight-long: rgba(250, 204, 21, 0.2); /* bg-yellow-400/20 */
+  --highlight-verylong: rgba(248, 113, 113, 0.2); /* bg-red-400/20 */
+  --highlight-adverb: rgba(96, 165, 250, 0.2); /* bg-blue-400/20 */
+  --highlight-passive: rgba(74, 222, 128, 0.2); /* bg-green-400/20 */
+  --highlight-weak: rgba(192, 132, 252, 0.2); /* bg-purple-400/20 */
 
-  /* Panel Colors */
-  --panel-red: #dc3545;
-  --panel-yellow: #ffc107;
-  --panel-blue: #0dcaf0;
-  --panel-green: #198754;
-  --panel-purple: #6f42c1;
-  --panel-grammar: #0d6efd;
+  /* Analysis panel colors - light mode */
+  --panel-grammar-bg: rgba(249, 115, 22, 0.1); /* bg-orange-500/10 */
+  --panel-grammar-dot: #f97316; /* bg-orange-500 */
+  --panel-long-bg: rgba(250, 204, 21, 0.2); /* bg-yellow-400/20 */
+  --panel-long-dot: #facc15; /* bg-yellow-500 */
+  --panel-verylong-bg: rgba(248, 113, 113, 0.2); /* bg-red-400/20 */
+  --panel-verylong-dot: #ef4444; /* bg-red-500 */
+  --panel-adverb-bg: rgba(96, 165, 250, 0.2); /* bg-blue-400/20 */
+  --panel-adverb-dot: #3b82f6; /* bg-blue-500 */
+  --panel-passive-bg: rgba(74, 222, 128, 0.2); /* bg-green-400/20 */
+  --panel-passive-dot: #22c55e; /* bg-green-500 */
+  --panel-weak-bg: rgba(192, 132, 252, 0.2); /* bg-purple-400/20 */
+  --panel-weak-dot: #a21caf; /* bg-purple-500 */
 }
 
 html.dark {
-  --bg-body: #212529;
-  --text-default: #f8f9fa;
-  --bg-panel: #343a40;
-  --text-subtle: #adb5bd;
-  --border-color: #495057;
-  --caret-color: #3b82f6;
-  --scrollbar-track: #2c3034;
-  --scrollbar-thumb: #495057;
-  --scrollbar-thumb-hover: #6c757d;
-  --suggestion-bg: #2c3034;
-  --suggestion-border: #3b82f6;
+  --bg-body: #111827; /* gray-900 */
+  --text-default: #f9fafb; /* gray-50 */
+  --bg-panel: #1f2937; /* gray-800 */
+  --text-subtle: #9ca3af; /* gray-400 */
+  --border-color: #374151; /* gray-700 */
+  --caret-color: #f59e0b; /* amber-500 */
+  --scrollbar-track: #1f2937;
+  --scrollbar-thumb: #4b5563;
+  --scrollbar-thumb-hover: #6b7280;
+  --suggestion-bg: #374151; /* gray-700 */
+  --suggestion-border: #f97316; /* orange-500 */
 
-  /* Hemingway Highlight Colors */
-  --highlight-yellow: rgba(255, 235, 59, 0.2);
-  --highlight-red: rgba(244, 67, 54, 0.2);
-  --highlight-blue: rgba(3, 169, 244, 0.2);
-  --highlight-green: rgba(76, 175, 80, 0.2);
-  --highlight-purple: rgba(156, 39, 176, 0.2);
-  --highlight-grammar: rgba(3, 169, 244, 0.2);
+  /* Highlight colors for the text editor */
+  --highlight-grammar: #fb923c; /* Bright amber for dark mode */
+  --highlight-long: rgba(250, 204, 21, 0.1); /* dark:bg-yellow-500/10 */
+  --highlight-verylong: rgba(239, 68, 68, 0.1); /* dark:bg-red-500/10 */
+  --highlight-adverb: rgba(59, 130, 246, 0.1); /* dark:bg-blue-500/10 */
+  --highlight-passive: rgba(34, 197, 94, 0.1); /* dark:bg-green-500/10 */
+  --highlight-weak: rgba(162, 28, 175, 0.1); /* dark:bg-purple-500/10 */
 
-  /* Panel Colors */
-  --panel-red: #f47174;
-  --panel-yellow: #ffe082;
-  --panel-blue: #80deea;
-  --panel-green: #a5d6a7;
-  --panel-purple: #ce93d8;
-  --panel-grammar: #80deea;
+  /* Analysis panel colors - dark mode */
+  --panel-grammar-bg: rgba(249, 115, 22, 0.1); /* dark:bg-orange-500/10 */
+  --panel-grammar-dot: #f97316; /* bg-orange-500 */
+  --panel-long-bg: rgba(250, 204, 21, 0.1); /* dark:bg-yellow-500/10 */
+  --panel-long-dot: #facc15; /* bg-yellow-500 */
+  --panel-verylong-bg: rgba(239, 68, 68, 0.1); /* dark:bg-red-500/10 */
+  --panel-verylong-dot: #ef4444; /* bg-red-500 */
+  --panel-adverb-bg: rgba(59, 130, 246, 0.1); /* dark:bg-blue-500/10 */
+  --panel-adverb-dot: #3b82f6; /* bg-blue-500 */
+  --panel-passive-bg: rgba(34, 197, 94, 0.1); /* dark:bg-green-500/10 */
+  --panel-passive-dot: #22c55e; /* bg-green-500 */
+  --panel-weak-bg: rgba(162, 28, 175, 0.1); /* dark:bg-purple-500/10 */
+  --panel-weak-dot: #a21caf; /* bg-purple-500 */
 }
 
 body {
-  font-family: 'Noto Naskh Arabic', 'Tajawal', sans-serif;
+  font-family: 'Noto Naskh Arabic', sans-serif;
   background-color: var(--bg-body);
   color: var(--text-default);
   transition: background-color 0.3s, color 0.3s;
@@ -124,26 +135,13 @@ body {
   position: relative;
   width: 100%;
   height: 70vh;
-  overflow: hidden;
+  overflow-y: auto;
   background-color: var(--bg-panel);
   transition: background-color 0.3s;
-  border-radius: 0.25rem;
-}
-
-.editor-textarea, .editor-highlights {
-  font-family: 'Noto Naskh Arabic', 'Tajawal', sans-serif;
-  overflow-y: auto;
-}
-
-.editor-highlights {
-  -webkit-text-fill-color: transparent;
-  pointer-events: none;
 }
 
 .editor-textarea {
   outline: none;
-  caret-color: var(--caret-color);
-  color: var(--text-default);
 }
 
 .editor-textarea:focus {
@@ -151,38 +149,66 @@ body {
 }
 
 .editor-textarea::-webkit-scrollbar {
+  width: 0 !important;
+  display: none;
+}
+
+.editor-container::-webkit-scrollbar {
   width: 8px;
 }
 
-.editor-textarea::-webkit-scrollbar-track {
+.editor-container::-webkit-scrollbar-track {
   background: var(--scrollbar-track);
 }
 
-.editor-textarea::-webkit-scrollbar-thumb {
+.editor-container::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 10px;
 }
 
-.editor-textarea::-webkit-scrollbar-thumb:hover {
+.editor-container::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
 
-/* Highlight styles - make sure these are the only highlight rules */
-.highlight-long-sentence {
-  background-color: var(--highlight-yellow) !important;
-}
-.highlight-very-long-sentence {
-  background-color: var(--highlight-red) !important;
-}
-.highlight-adverb {
-  background-color: var(--highlight-blue) !important;
-}
-.highlight-passive {
-  background-color: var(--highlight-green) !important;
-}
-.highlight-weak {
-  background-color: var(--highlight-purple) !important;
-}
+/* Text editor highlight classes */
 .highlight-grammar {
   background-color: var(--highlight-grammar) !important;
+}
+
+.highlight-long-sentence {
+  background-color: var(--highlight-long) !important;
+}
+
+.highlight-very-long-sentence {
+  background-color: var(--highlight-verylong) !important;
+}
+
+.highlight-adverb {
+  background-color: var(--highlight-adverb) !important;
+}
+
+.highlight-passive {
+  background-color: var(--highlight-passive) !important;
+}
+
+.highlight-weak {
+  background-color: var(--highlight-weak) !important;
+}
+
+/* Modal styles */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 99999 !important;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 100000 !important;
+}
+
+/* Ensure modal appears above everything */
+[data-modal] {
+  z-index: 99999 !important;
 }

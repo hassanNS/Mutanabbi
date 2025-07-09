@@ -5,6 +5,7 @@ import { TextAnalysis, GrammarSuggestion } from '@/types';
 import { analyzeText } from '@/lib/textAnalysis';
 import { analyzeGrammar, translateText } from '@/lib/gemini';
 import { debounce, generateHighlights } from '@/utils/helpers';
+import { SAMPLE_TEXT } from '@/utils/constants';
 
 interface TextEditorProps {
   analysis: TextAnalysis;
@@ -13,6 +14,7 @@ interface TextEditorProps {
   onGrammarSuggestionsChange?: (suggestions: GrammarSuggestion[] | ((prev: GrammarSuggestion[]) => GrammarSuggestion[])) => void;
   onTranslationChange?: (translation: string) => void;
   onLoadingChange?: (isLoading: boolean) => void;
+  aiEnabled: boolean; // New prop for AI toggle
 }
 
 export function TextEditor({
@@ -21,7 +23,8 @@ export function TextEditor({
   onAnalysisChange,
   onGrammarSuggestionsChange,
   onTranslationChange,
-  onLoadingChange
+  onLoadingChange,
+  aiEnabled
 }: TextEditorProps) {
   const [text, setText] = useState('');
   const [highlights, setHighlights] = useState('');
@@ -34,6 +37,13 @@ export function TextEditor({
 
   // Full document analysis (for translation and consistency)
   const performFullAiAnalysis = useCallback(async (inputText: string, signal: AbortSignal) => {
+    // Don't perform AI analysis if it's disabled
+    if (!aiEnabled) {
+      onGrammarSuggestionsChange?.([]);
+      onTranslationChange?.('...');
+      return;
+    }
+
     const trimmedText = inputText.trim();
     if (trimmedText.length < 10) {
       onGrammarSuggestionsChange?.([]);
@@ -71,7 +81,7 @@ export function TextEditor({
         onLoadingChange?.(false);
       }
     }
-  }, [onGrammarSuggestionsChange, onTranslationChange, onLoadingChange]);
+  }, [onGrammarSuggestionsChange, onTranslationChange, onLoadingChange, aiEnabled]); // Add aiEnabled to dependencies
 
   // Debounced version of the full analysis
   const debouncedFullAiAnalysis = useCallback(
@@ -89,6 +99,9 @@ export function TextEditor({
 
   // High-priority sentence analysis
   const analyzeJustCompletedSentence = useCallback(async (sentence: string) => {
+    // Skip if AI is disabled
+    if (!aiEnabled) return;
+
     console.log("Analyzing sentence:", sentence);
     try {
       const controller = new AbortController();
@@ -105,30 +118,36 @@ export function TextEditor({
     } catch (error) {
       console.error('Sentence analysis error:', error);
     }
-  }, [onGrammarSuggestionsChange]);
+  }, [onGrammarSuggestionsChange, aiEnabled]); // Add aiEnabled to dependencies
 
   const handleTextChange = useCallback((value: string) => {
     const previousText = text;
     setText(value);
 
-    // Tier 1: Instant Rule-Based Analysis
+    // Tier 1: Instant Rule-Based Analysis (always enabled)
     const newAnalysis = analyzeText(value);
     onAnalysisChange?.(newAnalysis);
 
-    // Tier 2: Instant End-of-Sentence AI Analysis
-    const newChar = value.length > previousText.length ? value[value.length - 1] : null;
-    if (newChar && ['.', '؟', '!'].includes(newChar)) {
-      // Extract the sentence that was just finished
-      const sentences = value.split(/([.؟!])/g);
-      const lastSentence = sentences[sentences.length - 2] + sentences[sentences.length - 1];
-      if (lastSentence.trim().length > 5) { // Basic check to avoid analyzing just a '.'
-        analyzeJustCompletedSentence(lastSentence.trim());
+    // Tier 2 & 3: AI Analysis (only when enabled)
+    if (aiEnabled) {
+      // Extract and analyze recently completed sentence
+      const newChar = value.length > previousText.length ? value[value.length - 1] : null;
+      if (newChar && ['.', '؟', '!'].includes(newChar)) {
+        const sentences = value.split(/([.؟!])/g);
+        const lastSentence = sentences[sentences.length - 2] + sentences[sentences.length - 1];
+        if (lastSentence.trim().length > 5) {
+          analyzeJustCompletedSentence(lastSentence.trim());
+        }
       }
-    }
 
-    // Tier 3: Debounced Full-Document Sync
-    debouncedFullAiAnalysis(value);
-  }, [text, onAnalysisChange, debouncedFullAiAnalysis, analyzeJustCompletedSentence]);
+      // Full document analysis with debounce
+      debouncedFullAiAnalysis(value);
+    } else if (!aiEnabled && previousText) {
+      // Clear AI suggestions when disabling
+      onGrammarSuggestionsChange?.([]);
+      onTranslationChange?.('...');
+    }
+  }, [text, aiEnabled, onAnalysisChange, debouncedFullAiAnalysis, analyzeJustCompletedSentence, onGrammarSuggestionsChange, onTranslationChange]); // Add dependencies
 
   // Update highlights when text or analysis changes
   useEffect(() => {
@@ -146,13 +165,12 @@ export function TextEditor({
 
   // Initialize with sample text
   useEffect(() => {
-    const sampleText = 'أنا يذهب الى السوق أمس لشراء بعض التفاح. يعتقد أن الكتابة هو فن، ويجري تطويرها بالممارسة المستمرة. من وجهة نظري، يجب على الكاتب أن يقرأ كثيرا.';
-    handleTextChange(sampleText);
+    handleTextChange(SAMPLE_TEXT);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
 
   return (
-    <div ref={editorContainerRef} className="editor-container rounded-lg shadow-lg">
+    <div ref={editorContainerRef} className="editor-container rounded-lg shadow-lg relative">
       <div
         ref={highlightsRef}
         className="editor-highlights"

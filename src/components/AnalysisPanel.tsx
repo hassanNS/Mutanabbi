@@ -8,6 +8,9 @@ interface AnalysisPanelProps {
   grammarSuggestions: GrammarSuggestion[];
   translation: string;
   isLoading?: boolean;
+  aiEnabled: boolean;
+  onToggleAi: (enabled: boolean) => void;
+  onShowAiWarning: () => void; // New prop to trigger warning modal
 }
 
 interface AnalysisItemProps {
@@ -19,9 +22,9 @@ interface AnalysisItemProps {
 
 function AnalysisItem({ label, count, color, bgColor }: AnalysisItemProps) {
   return (
-    <div className={`flex justify-between items-center p-3 rounded-md ${bgColor}`}>
+    <div className="flex justify-between items-center p-3 rounded-md" style={{ backgroundColor: `var(${bgColor})` }}>
       <div className="flex items-center gap-3">
-        <div className={`w-4 h-4 rounded-full ${color}`}></div>
+        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: `var(${color})` }}></div>
         <span className="font-semibold">{label}</span>
       </div>
       <span className="font-bold text-xl">{count}</span>
@@ -35,23 +38,40 @@ interface GrammarSectionProps {
   isLoading: boolean;
 }
 
-function GrammarSection({ count, suggestions, isLoading }: GrammarSectionProps) {
+function GrammarSection({ count, suggestions, isLoading, aiEnabled, onToggleAi, onShowAiWarning }: GrammarSectionProps & { aiEnabled: boolean, onToggleAi: (enabled: boolean) => void, onShowAiWarning: () => void }) {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Handle toggle click
+  const handleToggleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!aiEnabled) {
+      onShowAiWarning(); // Trigger the warning modal at page level
+    } else {
+      onToggleAi(false);
+    }
+  };
 
   return (
     <>
       <div
         className="cursor-pointer p-3 rounded-md"
-        style={{ backgroundColor: 'var(--highlight-grammar)'}}
-        onClick={() => setIsExpanded(!isExpanded)}
+        style={{ backgroundColor: 'var(--panel-grammar-bg)' }}
+        onClick={() => aiEnabled && setIsExpanded(!isExpanded)}
       >
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: 'var(--panel-grammar)' }}></div>
+            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: 'var(--panel-grammar-dot)' }}></div>
             <span className="font-semibold">أخطاء محتملة (AI)</span>
+            <button
+              className={`text-xs px-2 py-1 rounded-full transition-colors ${aiEnabled ? 'bg-green-500 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`}
+              onClick={handleToggleClick}
+              title={aiEnabled ? "إيقاف تشغيل تحليل الذكاء الاصطناعي" : "تشغيل تحليل الذكاء الاصطناعي"}
+            >
+              {aiEnabled ? "مفعل" : "معطل"}
+            </button>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-bold text-xl">{count}</span>
+            <span className="font-bold text-xl">{aiEnabled ? count : 0}</span>
             <svg
               className={`w-5 h-5 transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
               style={{ color: 'var(--text-subtle)' }}
@@ -65,9 +85,13 @@ function GrammarSection({ count, suggestions, isLoading }: GrammarSectionProps) 
         </div>
       </div>
 
-      <div className={`suggestions-panel pr-4 ${isExpanded ? 'expanded' : ''}`}>
-        {suggestions.length === 0 ? (
-          <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>
+      <div className={`suggestions-panel pr-4 ${isExpanded && aiEnabled ? 'expanded' : ''}`}>
+        {!aiEnabled ? (
+          <p className="p-2 text-sm" style={{ color: 'var(--text-subtle)' }}>
+            تحليل الذكاء الاصطناعي معطل حاليا. يرجى تشغيله للحصول على الاقتراحات.
+          </p>
+        ) : suggestions.length === 0 ? (
+          <p className="p-2 text-sm" style={{ color: 'var(--text-subtle)' }}>
             لم يتم العثور على أخطاء. عمل رائع!
           </p>
         ) : (
@@ -81,21 +105,10 @@ function GrammarSection({ count, suggestions, isLoading }: GrammarSectionProps) 
               }}
             >
               <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>الخطأ:</p>
-              <p className="font-semibold line-through" style={{ color: 'var(--panel-red)' }}>{item.error}</p>
+              <p className="font-semibold text-red-500 dark:text-red-400 line-through">{item.error}</p>
               <p className="text-sm mt-2" style={{ color: 'var(--text-subtle)' }}>الاقتراح:</p>
-              <p className="font-semibold" style={{ color: 'var(--panel-green)' }}>
-                {item.suggestion}
-              </p>
-              <p className="text-xs mt-2" style={{ color: 'var(--text-subtle)' }}>
-                {/* Check if explanation contains English text and set direction accordingly */}
-                <span style={{
-                  display: 'block',
-                  direction: /[a-zA-Z]/.test(item.explanation) ? 'ltr' : 'rtl',
-                  textAlign: /[a-zA-Z]/.test(item.explanation) ? 'left' : 'right'
-                }}>
-                  {item.explanation}
-                </span>
-              </p>
+              <p className="font-semibold text-green-600 dark:text-green-400">{item.suggestion}</p>
+              <p className="text-xs mt-2" style={{ color: 'var(--text-subtle)' }}>{item.explanation}</p>
             </div>
           ))
         )}
@@ -104,12 +117,12 @@ function GrammarSection({ count, suggestions, isLoading }: GrammarSectionProps) 
   );
 }
 
-export function AnalysisPanel({ analysis, grammarSuggestions, translation, isLoading }: AnalysisPanelProps) {
+export function AnalysisPanel({ analysis, grammarSuggestions, translation, isLoading, aiEnabled, onToggleAi, onShowAiWarning }: AnalysisPanelProps) {
   return (
-    <div className="p-6 rounded-lg shadow-lg" style={{ backgroundColor: 'var(--bg-panel)', borderRadius: '0.25rem' }}>
+    <div className="p-6 rounded-lg shadow-lg" style={{ backgroundColor: 'var(--bg-panel)' }}>
       <div className="flex justify-between items-center border-b pb-3 mb-4" style={{ borderColor: 'var(--border-color)' }}>
         <h2 className="text-2xl font-bold">التحليل</h2>
-        {isLoading && (
+        {isLoading && aiEnabled && (
           <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--text-subtle)' }}>
             <span className="loader"></span>
             <span>تحليل AI...</span>
@@ -122,41 +135,44 @@ export function AnalysisPanel({ analysis, grammarSuggestions, translation, isLoa
           count={grammarSuggestions.length}
           suggestions={grammarSuggestions}
           isLoading={isLoading || false}
+          aiEnabled={aiEnabled}
+          onToggleAi={onToggleAi}
+          onShowAiWarning={onShowAiWarning}
         />
 
         <AnalysisItem
           label="جمل طويلة"
           count={analysis.longSentenceCount}
-          color="bg-[var(--panel-yellow)]"
-          bgColor="bg-[var(--highlight-yellow)]"
+          color="--panel-long-dot"
+          bgColor="--panel-long-bg"
         />
 
         <AnalysisItem
           label="جمل طويلة جدًا"
           count={analysis.veryLongSentenceCount}
-          color="bg-[var(--panel-red)]"
-          bgColor="bg-[var(--highlight-red)]"
+          color="--panel-verylong-dot"
+          bgColor="--panel-verylong-bg"
         />
 
         <AnalysisItem
           label="الحال / الظرف"
           count={analysis.adverbCount}
-          color="bg-[var(--panel-blue)]"
-          bgColor="bg-[var(--highlight-blue)]"
+          color="--panel-adverb-dot"
+          bgColor="--panel-adverb-bg"
         />
 
         <AnalysisItem
           label="المبني للمجهول"
           count={analysis.passiveCount}
-          color="bg-[var(--panel-green)]"
-          bgColor="bg-[var(--highlight-green)]"
+          color="--panel-passive-dot"
+          bgColor="--panel-passive-bg"
         />
 
         <AnalysisItem
           label="عبارات ضعيفة"
           count={analysis.weakPhraseCount}
-          color="bg-[var(--panel-purple)]"
-          bgColor="bg-[var(--highlight-purple)]"
+          color="--panel-weak-dot"
+          bgColor="--panel-weak-bg"
         />
       </div>
 

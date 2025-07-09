@@ -14,10 +14,10 @@ export function analyzeText(text: string): TextAnalysis {
   const trimmedText = text.trim();
   const words = trimmedText.length > 0 ? trimmedText.split(/\s+/).filter(Boolean) : [];
 
-  // Create regex patterns
-  const weakPhraseRegex = new RegExp(`\\b(${WEAK_PHRASES.join('|')})\\b`, 'g');
-  const passiveRegex = new RegExp(`\\b(${PASSIVE_VOICE_INDICATORS.join('|')})\\b`, 'g');
-  const adverbRegex = new RegExp(`\\b(${ADVERBS.join('|')})\\b`, 'g');
+  // Remove \b for Arabic regex matching
+  const weakPhraseRegex = new RegExp(`(${WEAK_PHRASES.join('|')})`, 'g');
+  const passiveRegex = new RegExp(`(${PASSIVE_VOICE_INDICATORS.join('|')})`, 'g');
+  const adverbRegex = new RegExp(`(${ADVERBS.join('|')})`, 'g');
 
   // Count matches
   const weakPhrases = text.match(weakPhraseRegex) || [];

@@ -37,17 +37,17 @@ export function generateHighlights(text: string, analysis: TextAnalysis, grammar
   const { weakPhrases, passives, adverbs } = analysis;
   if (weakPhrases.length > 0) {
     const unique = Array.from(new Set(weakPhrases));
-    const regex = new RegExp(`\\b(${unique.map(escapeRegex).join('|')})\\b`, 'g');
+    const regex = new RegExp(`(${unique.map(escapeRegex).join('|')})`, 'g');
     highlightedHtml = highlightedHtml.replace(regex, '<span class="highlight-weak">$&</span>');
   }
   if (passives.length > 0) {
     const unique = Array.from(new Set(passives));
-    const regex = new RegExp(`\\b(${unique.map(escapeRegex).join('|')})\\b`, 'g');
+    const regex = new RegExp(`(${unique.map(escapeRegex).join('|')})`, 'g');
     highlightedHtml = highlightedHtml.replace(regex, '<span class="highlight-passive">$&</span>');
   }
   if (adverbs.length > 0) {
     const unique = Array.from(new Set(adverbs));
-    const regex = new RegExp(`\\b(${unique.map(escapeRegex).join('|')})\\b`, 'g');
+    const regex = new RegExp(`(${unique.map(escapeRegex).join('|')})`, 'g');
     highlightedHtml = highlightedHtml.replace(regex, '<span class="highlight-adverb">$&</span>');
   }
 
@@ -89,4 +89,18 @@ export function generateHighlights(text: string, analysis: TextAnalysis, grammar
   }
 
   return finalHtml.replace(/\n/g, '<br>');
+}
+
+/**
+ * Normalizes Arabic text for better comparison and caching
+ */
+export function normalizeArabicText(text: string): string {
+  return text
+    .trim()
+    .toLowerCase()
+    .replace(/[\u064B-\u0652]/g, '') // Remove Arabic diacritics (tashkeel)
+    .replace(/[أإآ]/g, 'ا') // Normalize alif variations
+    .replace(/[ىي]/g, 'ي') // Normalize yaa variations
+    .replace(/ة/g, 'ه') // Normalize taa marbuta
+    .replace(/\s+/g, ' '); // Normalize whitespace
 }

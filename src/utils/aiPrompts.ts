@@ -44,6 +44,6 @@ export function getGrammarAnalysisPrompt(text: string): string {
  * @returns Formatted prompt for translation
  */
 export function getTranslationPrompt(text: string, targetLanguage: string): string {
-  return `Translate the following Arabic text to ${targetLanguage}. Return only the translated text, with no additional formatting or explanations. Text: '${text}'`;
+  return `Translate to ${targetLanguage}. Add no additional explanations. Text: '${text}'`;
 }
 

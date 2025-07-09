@@ -12,7 +12,10 @@ if (!apiKey || !apiUrl || !apiPostfix) {
   console.error("One or more Gemini API environment variables are not set. AI features will be disabled.");
 }
 
+// Simple cache implementations
 const grammarCache = new Map<string, GrammarSuggestion[]>();
+const translationCache = new Map<string, string>();
+
 export async function analyzeGrammar(text: string, signal: AbortSignal): Promise<GrammarSuggestion[]> {
   if (!apiKey || !apiUrl || !apiPostfix) {
     console.error("Gemini client not initialized. Check environment variables.");
@@ -20,7 +23,10 @@ export async function analyzeGrammar(text: string, signal: AbortSignal): Promise
   }
 
   const trimmedText = text.trim();
+
+  // Simple cache lookup
   if (grammarCache.has(trimmedText)) {
+    console.log("Grammar cache hit!");
     return grammarCache.get(trimmedText)!;
   }
 
@@ -58,7 +64,16 @@ export async function analyzeGrammar(text: string, signal: AbortSignal): Promise
 
     try {
         const suggestions: GrammarSuggestion[] = JSON.parse(responseText);
+
+        // Store in cache
         grammarCache.set(trimmedText, suggestions);
+
+        // Limit cache size to prevent memory leaks (keep most recent 100 entries)
+        if (grammarCache.size > 100) {
+          const keysToDelete = Array.from(grammarCache.keys()).slice(0, grammarCache.size - 100);
+          keysToDelete.forEach(key => grammarCache.delete(key));
+        }
+
         return suggestions;
     } catch (e) {
         console.error("Error parsing grammar analysis JSON:", e, "Received:", responseText);
@@ -70,19 +85,21 @@ export async function analyzeGrammar(text: string, signal: AbortSignal): Promise
     } else {
       console.error('Error analyzing grammar:', error);
     }
-    throw error; // Re-throw to be handled by the caller
+    throw error;
   }
 }
 
-const translationCache = new Map<string, string>();
 export async function translateText(text: string, targetLanguage: string, signal: AbortSignal): Promise<string> {
-    if (!apiKey || !apiUrl || !apiPostfix) {
-        console.error("Gemini client not initialized. Check environment variables.");
-        return "Translation Error: Missing API Key.";
-    }
+  if (!apiKey || !apiUrl || !apiPostfix) {
+      console.error("Gemini client not initialized. Check environment variables.");
+      return "Translation Error: Missing API Key.";
+  }
 
   const cacheKey = `${text}:${targetLanguage}`;
+
+  // Simple cache lookup
   if (translationCache.has(cacheKey)) {
+    console.log("Translation cache hit!");
     return translationCache.get(cacheKey)!;
   }
 
@@ -114,7 +131,15 @@ export async function translateText(text: string, targetLanguage: string, signal
         return "Translation Error.";
     }
 
+    // Store in cache
     translationCache.set(cacheKey, translation);
+
+    // Limit cache size to prevent memory leaks (keep most recent 100 entries)
+    if (translationCache.size > 100) {
+      const keysToDelete = Array.from(translationCache.keys()).slice(0, translationCache.size - 100);
+      keysToDelete.forEach(key => translationCache.delete(key));
+    }
+
     return translation;
   } catch (error: any) {
     if (error.name === 'AbortError') {
@@ -122,6 +147,6 @@ export async function translateText(text: string, targetLanguage: string, signal
     } else {
       console.error(`Error translating text to ${targetLanguage}:`, error);
     }
-    throw error; // Re-throw to be handled by the caller
+    throw error;
   }
 }
