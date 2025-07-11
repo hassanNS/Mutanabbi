@@ -227,34 +227,91 @@ html.dark .compact-analysis-expanded {
   box-shadow: -10px 0 25px -5px rgba(0, 0, 0, 0.3);
 }
 
-/* Responsive editor layout when panel is expanded */
-.compact-analysis-expanded ~ .editor-content,
-.compact-analysis-expanded ~ #editor-container {
-  padding-right: 320px;
-  transition: padding-right 0.3s ease-in-out;
+/* Analysis panel styles */
+.analysis-panel {
+  transition: width 0.3s ease;
 }
 
-/* Ensure backdrop doesn't interfere with scrolling */
-.compact-analysis-backdrop {
-  pointer-events: none;
+/* Make scrollbars less prominent in panel */
+.analysis-panel::-webkit-scrollbar {
+  width: 4px;
 }
 
-/* Better hover states for collapsed panel */
-.compact-analysis-collapsed {
-  transition: all 0.2s ease-in-out;
+.analysis-panel::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.compact-analysis-collapsed:hover {
-  transform: scale(1.05);
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+.analysis-panel::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
 }
 
-html.dark .compact-analysis-collapsed:hover {
-  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.3);
+/* Hemingway-style sidebar layout */
+@media (max-width: 768px) {
+  .container {
+    padding-right: 1rem !important;
+    padding-left: 1rem !important;
+  }
+
+  .editor-container {
+    height: 50vh; /* Shorter on mobile */
+  }
 }
 
-/* Ensure the main content doesn't overlap with the expanded panel */
-.main-content-shifted {
-  padding-right: 320px;
-  transition: padding-right 0.3s ease-in-out;
+/* Better loader positioning */
+.loader-small {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--text-default);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
 }
+
+/* Space between editor and sidebar on desktop */
+@media (min-width: 768px) {
+  .flex-row > div:first-child {
+    margin-right: 1rem;
+  }
+}
+
+/* Custom scrollbar for AI suggestions */
+.ai-suggestions-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.ai-suggestions-scroll::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 2px;
+}
+
+.ai-suggestions-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 2px;
+}
+
+.ai-suggestions-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Logo styles */
+.logo-image {
+  filter: none;
+  transition: filter 0.3s ease;
+}
+
+html.dark .logo-image {
+  filter: invert(1);
+}
+
+/* Stack the panels vertically on mobile */
+.compact-analysis-expanded {
+  position: static;
+  width: 100%;
+  margin: 1rem auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 0.5rem;
+}
+

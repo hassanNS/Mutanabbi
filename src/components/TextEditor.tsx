@@ -3,7 +3,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { TextAnalysis, GrammarSuggestion } from '@/types';
 import { analyzeText } from '@/lib/textAnalysis';
-import { analyzeGrammar, translateText } from '@/lib/gemini';
+import { analyzeGrammar } from '@/lib/gemini';
+import { translateText } from '@/lib/translation';
 import { debounce, generateHighlights } from '@/utils/helpers';
 import { SAMPLE_TEXT } from '@/utils/constants';
 
