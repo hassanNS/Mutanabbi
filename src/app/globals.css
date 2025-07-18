@@ -19,11 +19,11 @@
 
   /* Highlight colors for the text editor */
   --highlight-grammar: #fb923c; /* Deep orange for clear distinction */
-  --highlight-long: rgba(250, 204, 21, 0.2); /* bg-yellow-400/20 */
-  --highlight-verylong: rgba(248, 113, 113, 0.2); /* bg-red-400/20 */
-  --highlight-adverb: rgba(96, 165, 250, 0.2); /* bg-blue-400/20 */
-  --highlight-passive: rgba(74, 222, 128, 0.2); /* bg-green-400/20 */
-  --highlight-weak: rgba(192, 132, 252, 0.2); /* bg-purple-400/20 */
+  --highlight-long: rgba(250, 204, 21, 0.4); /* bg-yellow-400/20 */
+  --highlight-verylong: rgba(248, 113, 113, 0.4); /* bg-red-400/20 */
+  --highlight-adverb: rgba(96, 165, 250, 0.4); /* bg-blue-400/20 */
+  --highlight-passive: rgba(74, 222, 128, 0.4); /* bg-green-400/20 */
+  --highlight-weak: rgba(196, 181, 253, 0.5); /* bg-purple-400/20 */
 
   /* Analysis panel colors - light mode */
   --panel-grammar-bg: rgba(249, 115, 22, 0.1); /* bg-orange-500/10 */
@@ -55,11 +55,11 @@ html.dark {
 
   /* Highlight colors for the text editor */
   --highlight-grammar: #fb923c; /* Bright amber for dark mode */
-  --highlight-long: rgba(250, 204, 21, 0.1); /* dark:bg-yellow-500/10 */
-  --highlight-verylong: rgba(239, 68, 68, 0.1); /* dark:bg-red-500/10 */
-  --highlight-adverb: rgba(59, 130, 246, 0.1); /* dark:bg-blue-500/10 */
-  --highlight-passive: rgba(34, 197, 94, 0.1); /* dark:bg-green-500/10 */
-  --highlight-weak: rgba(162, 28, 175, 0.1); /* dark:bg-purple-500/10 */
+  --highlight-long: rgba(254, 202, 202, 0.4); /* dark:bg-yellow-500/10 */
+  --highlight-verylong: rgba(239, 68, 68, 0.4); /* dark:bg-red-500/10 */
+  --highlight-adverb: rgba(96, 165, 250, 0.4); /* dark:bg-blue-500/10 */
+  --highlight-passive: rgba(34, 197, 94, 0.4); /* dark:bg-green-500/10 */
+  --highlight-weak: rgba(91, 33, 182, 0.4); /* dark:bg-purple-500/10 */
 
   /* Analysis panel colors - dark mode */
   --panel-grammar-bg: rgba(249, 115, 22, 0.1); /* dark:bg-orange-500/10 */

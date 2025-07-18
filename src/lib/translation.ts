@@ -2,12 +2,12 @@
 const translationCache = new Map<string, string>();
 
 /**
- * Translates text using the Google Translate API
+ * Translates text using a simple translation service
  * @param text - The text to translate
- * @param targetLanguage - The language code to translate to (e.g., 'en' for English)
+ * @param targetLanguage - The language code to translate to (e.g., 'English' for English)
  * @param signal - AbortSignal for cancelling the request
  */
-export async function translateText(text: string, targetLanguage: string = 'en', signal?: AbortSignal): Promise<string> {
+export async function translateText(text: string, targetLanguage: string = 'English', signal?: AbortSignal): Promise<string> {
   const trimmedText = text.trim();
   if (!trimmedText) {
     return '';
@@ -23,16 +23,15 @@ export async function translateText(text: string, targetLanguage: string = 'en',
   }
 
   try {
-    // Use Google Translate API - Client-side approach
+    // Use a simple translation approach using Google Translate's public endpoint
     const params = new URLSearchParams({
-      client: 'gtx', // Using unofficial API
-      sl: 'auto', // Source language auto-detect
-      tl: targetLanguage, // Target language
-      dt: 't', // Translation type
-      q: trimmedText // Text to translate
+      client: 'gtx',
+      sl: 'ar', // Source language (Arabic)
+      tl: 'en', // Target language (English)
+      dt: 't',
+      q: trimmedText
     });
 
-    // Using Google Translate API
     const response = await fetch(`https://translate.googleapis.com/translate_a/single?${params.toString()}`, {
       method: 'GET',
       signal: signal,
@@ -45,10 +44,8 @@ export async function translateText(text: string, targetLanguage: string = 'en',
     const data = await response.json();
 
     // Extract translation from response
-    // Google Translate returns a nested array structure
     let translatedText = '';
     if (data && Array.isArray(data[0])) {
-      // Combine all translation segments
       translatedText = data[0]
         .filter(segment => segment && segment[0])
         .map(segment => segment[0])
@@ -66,13 +63,13 @@ export async function translateText(text: string, targetLanguage: string = 'en',
       }
     }
 
-    return translatedText || 'Translation error';
+    return translatedText || 'Translation not available';
   } catch (error: any) {
     if (error.name === 'AbortError') {
       console.log('Translation request was aborted.');
     } else {
       console.error('Translation error:', error);
     }
-    throw error;
+    return 'Translation error';
   }
 }

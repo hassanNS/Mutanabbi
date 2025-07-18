@@ -33,13 +33,13 @@ export function AiWarningModal({ onConfirm, onDismiss }: AiWarningModalProps) {
             onClick={onDismiss}
             className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-md transition-colors"
           >
-            إلغاء
+            Cancel
           </button>
           <button
             onClick={onConfirm}
             className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
           >
-            فهمت، تشغيل تحليل الذكاء الاصطناعي
+            Understood, enable AI analysis
           </button>
         </div>
       </div>

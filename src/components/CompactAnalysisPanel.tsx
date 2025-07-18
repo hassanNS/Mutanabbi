@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { TextAnalysis, GrammarSuggestion } from '@/types';
 import { cn } from '@/utils/helpers';
+import { LuMinimize2 } from 'react-icons/lu'
+import { CompactAnalysisHeader } from './CompactAnalysisHeader';
 
 interface CompactAnalysisPanelProps {
   analysis: TextAnalysis;
@@ -14,8 +16,9 @@ interface CompactAnalysisPanelProps {
   onShowAiWarning: () => void;
   isMinimized: boolean;
   onToggleMinimize: (minimized: boolean) => void;
-  isMobile: boolean;
 }
+
+
 
 export function CompactAnalysisPanel({
   analysis,
@@ -27,7 +30,6 @@ export function CompactAnalysisPanel({
   onShowAiWarning,
   isMinimized,
   onToggleMinimize,
-  isMobile
 }: CompactAnalysisPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false); // For detailed AI suggestions
 
@@ -52,31 +54,44 @@ export function CompactAnalysisPanel({
   // If in minimized state, show the floating panel
   if (isMinimized) {
     return (
-      <div
-        className="fixed right-4 top-1/2 transform -translate-y-1/2 cursor-pointer border-2 rounded-lg p-3 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-        onClick={handleMinimizeClick}
-        style={{
-          zIndex: 40,
-          backgroundColor: 'var(--bg-panel)',
-          borderColor: 'var(--border-color)'
-        }}
-      >
-        <div className="space-y-2 text-right text-sm">
-          <div className="flex items-center justify-end gap-2 hover:opacity-75 transition-opacity">
-            <span className="font-medium">{aiEnabled ? grammarSuggestions.length : 0}</span>
-            <span style={{ color: 'var(--text-subtle)' }}>AI:</span>
+      <aside className="w-full mt-4 sm:w-60 sm:shrink-0 shadow-md rounded-lg" style={{ backgroundColor: 'var(--bg-panel)' }}>
+        <CompactAnalysisHeader
+          isMinimized={isMinimized}
+          isLoading={isLoading}
+          aiEnabled={aiEnabled}
+          handleMinimizeClick={handleMinimizeClick}
+        />
+        <div className="py-4 px-4 text-left text-md">
+          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-grammar-dot)' }}></div>
             {isLoading && aiEnabled && <span className="loader-small ml-1"></span>}
+            <span style={{ color: 'var(--text-subtle)' }}>AI Suggestions:</span>
+            <span className="font-medium">{aiEnabled ? grammarSuggestions.length : 0}</span>
           </div>
-          <div className="flex items-center justify-end gap-2 hover:opacity-75 transition-opacity">
-            <span className="font-medium">{analysis.longSentenceCount}</span>
-            <span style={{ color: 'var(--text-subtle)' }}>Long:</span>
+          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-long-dot)' }}></div>
+            <span style={{ color: 'var(--text-subtle)' }}>Long:</span>
+            <span className="font-medium">{analysis.longSentenceCount}</span>
           </div>
-          <div className="flex items-center justify-end gap-2 hover:opacity-75 transition-opacity">
-            <span className="font-medium">{analysis.veryLongSentenceCount}</span>
-            <span style={{ color: 'var(--text-subtle)' }}>VLong:</span>
+          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-verylong-dot)' }}></div>
+            <span style={{ color: 'var(--text-subtle)' }}>VLong:</span>
+            <span className="font-medium">{analysis.veryLongSentenceCount}</span>
+          </div>
+          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-adverb-dot)' }}></div>
+            <span style={{ color: 'var(--text-subtle)' }}>Adverbs:</span>
+            <span className="font-medium">{analysis.adverbCount}</span>
+          </div>
+          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-passive-dot)' }}></div>
+            <span style={{ color: 'var(--text-subtle)' }}>Passive:</span>
+            <span className="font-medium">{analysis.passiveCount}</span>
+          </div>
+          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-weak-dot)' }}></div>
+            <span style={{ color: 'var(--text-subtle)' }}>Weak:</span>
+            <span className="font-medium">{analysis.weakPhraseCount}</span>
           </div>
           <div className="hover:opacity-75 transition-opacity mt-4 pt-2 border-t text-center" style={{ borderColor: 'var(--border-color)' }}>
             <div style={{ color: 'var(--text-subtle)' }}>
@@ -84,35 +99,21 @@ export function CompactAnalysisPanel({
             </div>
           </div>
         </div>
-      </div>
+      </aside>
     );
   }
 
   // Normal expanded state - integrated with flex layout
   return (
-    <div className={cn(
-      "shadow-md",
-      isMobile ? "w-full mt-4" : "w-60 shrink-0", // Width & positioning
-    )} style={{ backgroundColor: 'var(--bg-panel)' }}>
-      <div className={isMobile ? "h-auto" : "h-full"} style={{ display: 'flex', flexDirection: 'column' }}>
+    <aside className="w-full mt-4 sm:w-60 sm:shrink-0 shadow-md rounded-lg" style={{ backgroundColor: 'var(--bg-panel)' }}>
+      <div className="h-full flex flex-col">
         {/* Header */}
-        <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-          <span className="font-bold text-sm">Analysis</span>
-          <div className="flex items-center gap-2">
-            {isLoading && aiEnabled && (
-              <span className="loader-small mr-1"></span>
-            )}
-            <button
-              onClick={handleMinimizeClick}
-              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-              title="Minimize panel"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" />
-              </svg>
-            </button>
-          </div>
-        </div>
+        <CompactAnalysisHeader
+          isMinimized={isMinimized}
+          isLoading={isLoading}
+          aiEnabled={aiEnabled}
+          handleMinimizeClick={handleMinimizeClick}
+        />
 
         {/* Content area - more compact */}
         <div className="flex-1 overflow-y-auto text-sm">
@@ -153,6 +154,7 @@ export function CompactAnalysisPanel({
                     }}>
                       <div className="space-y-1" dir="ltr">
                         <div className="font-medium text-red-500 line-through text-right" dir="rtl">{item.error}</div>
+                        <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="rtl">{item.explanation}</div>
                         <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
                       </div>
                     </div>
@@ -236,6 +238,6 @@ export function CompactAnalysisPanel({
           )}
         </div>
       </div>
-    </div>
+    </aside>
   );
 }

@@ -30,8 +30,6 @@ export default function Home() {
   const [aiEnabled, setAiEnabled] = useState(false);
   const [showAiWarning, setShowAiWarning] = useState(false);
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
-  // Track if we're on mobile for responsive layout
-  const [isMobile, setIsMobile] = useState(false);
 
   // Handle functional updates to grammar suggestions
   const handleGrammarSuggestionsChange = (suggestionsOrUpdater: GrammarSuggestion[] | ((prev: GrammarSuggestion[]) => GrammarSuggestion[])) => {
@@ -53,20 +51,9 @@ export default function Home() {
     setShowAiWarning(false);
   };
 
-  // Handle window resize for responsive layout
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <>
-      <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-body)' }}>
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-body)' }}>
         <header className="relative text-center justify-center py-8">
           <div className="flex items-center justify-center">
               <div className="flex flex-col -mt-8 sm:mt-0 sm:relative sm:h-20 sm:w-36 items-center justify-center">
@@ -82,7 +69,7 @@ export default function Home() {
                 <h1 className="text-4xl font-bold sm:absolute sm:top-5 sm:left-[2.5rem]">Mutanabbi</h1>
               </div>
           </div>
-          <p className="text-lg" style={{ color: 'var(--text-subtle)', direction: 'ltr' }}>
+          <p className="text-lg" style={{ color: 'var(--text-subtle)'}}>
             Improve your Arabic composition by writing clear and correct Arabic prose.
           </p>
           <div className="absolute top-8 left-10">
@@ -91,9 +78,9 @@ export default function Home() {
         </header>
 
         {/* Flex container for editor and analysis panel */}
-        <div className={`container mx-auto px-4 pb-8 ${isMobile ? 'flex flex-col' : 'flex flex-row'}`}>
+        <section className="w-[95%] mx-auto px-4 pb-8 flex flex-col sm:flex-row sm:gap-2 items-center">
           {/* Editor takes most of the space */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 w-full">
             <TextEditor
               analysis={analysis}
               grammarSuggestions={grammarSuggestions}
@@ -106,19 +93,20 @@ export default function Home() {
           </div>
 
           {/* Analysis panel - part of the same flex container */}
-          <CompactAnalysisPanel
-            analysis={analysis}
-            grammarSuggestions={grammarSuggestions}
-            translation={translation}
-            isLoading={isLoading}
-            aiEnabled={aiEnabled}
-            onToggleAi={setAiEnabled}
-            onShowAiWarning={() => setShowAiWarning(true)}
-            isMinimized={isPanelMinimized}
-            onToggleMinimize={setIsPanelMinimized}
-            isMobile={isMobile}
-          />
-        </div>
+          <div>
+            <CompactAnalysisPanel
+              analysis={analysis}
+              grammarSuggestions={grammarSuggestions}
+              translation={translation}
+              isLoading={isLoading}
+              aiEnabled={aiEnabled}
+              onToggleAi={setAiEnabled}
+              onShowAiWarning={() => setShowAiWarning(true)}
+              isMinimized={isPanelMinimized}
+              onToggleMinimize={setIsPanelMinimized}
+            />
+          </div>
+        </section>
       </div>
 
       {/* AI Warning Modal */}

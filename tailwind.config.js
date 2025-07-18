@@ -9,11 +9,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        'tajawal': ['Tajawal', 'sans-serif'],
-      },
-      colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
+        'arabic': ['Noto Naskh Arabic', 'Tajawal', 'sans-serif'],
       },
     },
   },

@@ -55,6 +55,8 @@ export async function analyzeGrammar(text: string, signal: AbortSignal): Promise
     const data = await response.json();
     const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
+    console.log(responseText);
+
     if (!responseText) {
         console.error("Error analyzing grammar: No response text from API", data);
         return [];
