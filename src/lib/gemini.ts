@@ -1,3 +1,5 @@
+'use client'
+
 import { GrammarSuggestion } from '@/types';
 import { getGrammarAnalysisPrompt } from '@/utils/aiPrompts';
 import { getApiRequestCount, incrementApiRequestCount } from '@/utils/helpers';

@@ -161,8 +161,8 @@ export function CompactAnalysisPanel({
                       borderColor: 'var(--panel-grammar-dot)'
                     }}>
                       <div className="space-y-1" dir="ltr">
-                        <div className="font-medium text-red-500 line-through text-right" dir="rtl">{item.error}</div>
-                        <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="rtl">{item.explanation}</div>
+                        <div className="font-medium text-red-500 line-through text-right" dir="ltr">{item.error}</div>
+                        <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="ltr">{item.explanation}</div>
                         <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
                       </div>
                     </div>

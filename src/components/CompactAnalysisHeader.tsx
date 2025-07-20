@@ -1,3 +1,5 @@
+'use client'
+
 import React, { Component } from 'react'
 import { LuExpand, LuMinimize2 } from 'react-icons/lu';
 

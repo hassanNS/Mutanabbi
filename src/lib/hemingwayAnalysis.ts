@@ -2,22 +2,8 @@ import { Extension } from '@tiptap/core'
 import { Plugin } from 'prosemirror-state'
 import { Decoration, DecorationSet } from 'prosemirror-view'
 import { Node } from 'prosemirror-model'
+import { WEAK_PHRASES, ADVERBS, PASSIVE_VOICE_INDICATORS } from '../utils/constants'
 
-// Analysis constants
-const WEAK_PHRASES = [
-  'يعني', 'نوعا ما', 'تقريبا', 'بصراحة', 'في الحقيقة', 'عادة', 'بشكل عام',
-  'على أي حال', 'في رأيي', 'من الواضح', 'بالتأكيد', 'هذا مثير'
-];
-
-const ADVERBS = [
-  'بسرعة', 'ببطء', 'بشدة', 'كثيرا', 'قليلا', 'تماما',
-  'أساسا', 'خصوصا', 'جدا', 'فعلا', 'حقا', 'طبعا', 'أبدا'
-];
-
-const PASSIVE_VOICE_INDICATORS = [
-  'تم', 'يتم', 'كان', 'كانت', 'سيتم', 'قد تم',
-  'أصبح', 'أصبحت', 'سوف يتم', 'تم إنجاز', 'تمت'
-];
 
 const LONG_SENTENCE_THRESHOLD = 15;
 const VERY_LONG_SENTENCE_THRESHOLD = 20;
@@ -28,15 +14,21 @@ interface Range {
   type: string;
 }
 
-// Function to find weak phrases
+// Function to find weak phrases - updated for better detection
 function findWeakPhrases(doc: Node): Range[] {
   const ranges: Range[] = [];
-  const regex = new RegExp(`(?<=^|\\s)(${WEAK_PHRASES.join('|')})(?=\\s|$)`, 'gi');
+  // Remove word boundary requirements for better matching in Arabic text
+  const regex = new RegExp(`(${WEAK_PHRASES.join('|')})`, 'gi');
 
   doc.descendants((node, pos) => {
     if (!node.isText) return;
+    const text = node.text || '';
+
+    // Reset lastIndex to ensure we start from the beginning
+    regex.lastIndex = 0;
+
     let match: RegExpExecArray | null;
-    while ((match = regex.exec(node.text!)) !== null) {
+    while ((match = regex.exec(text)) !== null) {
       ranges.push({
         from: pos + match.index,
         to: pos + match.index + match[0].length,
@@ -48,15 +40,21 @@ function findWeakPhrases(doc: Node): Range[] {
   return ranges;
 }
 
-// Function to find adverbs
+// Function to find adverbs - updated for better detection
 function findAdverbs(doc: Node): Range[] {
   const ranges: Range[] = [];
-  const regex = new RegExp(`(?<=^|\\s)(${ADVERBS.join('|')})(?=\\s|$)`, 'gi');
+  // Remove word boundary requirements for better matching in Arabic text
+  const regex = new RegExp(`(${ADVERBS.join('|')})`, 'gi');
 
   doc.descendants((node, pos) => {
     if (!node.isText) return;
+    const text = node.text || '';
+
+    // Reset lastIndex to ensure we start from the beginning
+    regex.lastIndex = 0;
+
     let match: RegExpExecArray | null;
-    while ((match = regex.exec(node.text!)) !== null) {
+    while ((match = regex.exec(text)) !== null) {
       ranges.push({
         from: pos + match.index,
         to: pos + match.index + match[0].length,
@@ -68,15 +66,21 @@ function findAdverbs(doc: Node): Range[] {
   return ranges;
 }
 
-// Function to find passive voice
+// Function to find passive voice - updated for better detection
 function findPassiveVoice(doc: Node): Range[] {
   const ranges: Range[] = [];
-  const regex = new RegExp(`(?<=^|\\s)(${PASSIVE_VOICE_INDICATORS.join('|')})(?=\\s|$)`, 'gi');
+  // Remove word boundary requirements for better matching in Arabic text
+  const regex = new RegExp(`(${PASSIVE_VOICE_INDICATORS.join('|')})`, 'gi');
 
   doc.descendants((node, pos) => {
     if (!node.isText) return;
+    const text = node.text || '';
+
+    // Reset lastIndex to ensure we start from the beginning
+    regex.lastIndex = 0;
+
     let match: RegExpExecArray | null;
-    while ((match = regex.exec(node.text!)) !== null) {
+    while ((match = regex.exec(text)) !== null) {
       ranges.push({
         from: pos + match.index,
         to: pos + match.index + match[0].length,
@@ -202,6 +206,44 @@ function findGrammarErrors(doc: Node, grammarSuggestions: any[] = []): Range[] {
   return ranges;
 }
 
+// Helper function to create decorations while preserving multiple highlights
+function createDecorationsFromRanges(ranges: Range[]): Decoration[] {
+  const decorations: Decoration[] = [];
+
+  // Process each range and create appropriate decorations
+  ranges.forEach(range => {
+    let className;
+    switch(range.type) {
+      case 'weak-phrase':
+        className = 'hemingway-weak';
+        break;
+      case 'adverb':
+        className = 'hemingway-adverb';
+        break;
+      case 'passive-voice':
+        className = 'hemingway-passive';
+        break;
+      case 'long-sentence':
+        className = 'hemingway-long-sentence';
+        break;
+      case 'very-long-sentence':
+        className = 'hemingway-very-long-sentence';
+        break;
+      case 'grammar-error':
+        className = 'highlight-grammar';
+        break;
+      default:
+        className = '';
+    }
+
+    if (className) {
+      decorations.push(Decoration.inline(range.from, range.to, { class: className }));
+    }
+  });
+
+  return decorations;
+}
+
 // Add TypeScript module declarations for the commands AND storage
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
@@ -304,78 +346,54 @@ export const Hemingway = Extension.create({
       new Plugin({
         state: {
           init(_, { doc }) {
-            const decorations: Decoration[] = [];
+            // Step 1: Collect all ranges first
+            const sentenceRanges = findLongSentences(doc);
+            const styleRanges: Range[] = [
+              ...findWeakPhrases(doc),
+              ...findAdverbs(doc),
+              ...findPassiveVoice(doc)
+            ];
 
-            // Find and add decorations for all analysis types
-            const weakPhraseRanges = findWeakPhrases(doc);
-            weakPhraseRanges.forEach(range => {
-              decorations.push(Decoration.inline(range.from, range.to, { class: 'hemingway-weak' }));
-            });
-
-            const adverbRanges = findAdverbs(doc);
-            adverbRanges.forEach(range => {
-              decorations.push(Decoration.inline(range.from, range.to, { class: 'hemingway-adverb' }));
-            });
-
-            const passiveRanges = findPassiveVoice(doc);
-            passiveRanges.forEach(range => {
-              decorations.push(Decoration.inline(range.from, range.to, { class: 'hemingway-passive' }));
-            });
-
-            const longSentenceRanges = findLongSentences(doc);
-            longSentenceRanges.forEach(range => {
-              const className = range.type === 'very-long-sentence'
-                ? 'hemingway-very-long-sentence'
-                : 'hemingway-long-sentence';
-              decorations.push(Decoration.inline(range.from, range.to, { class: className }));
-            });
-
-            // Add grammar errors from AI suggestions
-            // Safely access the editor's storage
+            // Step 2: Add grammar error highlights
             const grammarSuggestions = extensionThis.editor?.storage?.hemingway?.grammarSuggestions || [];
-            const grammarErrorRanges = findGrammarErrors(doc, grammarSuggestions);
-            grammarErrorRanges.forEach(range => {
-              decorations.push(Decoration.inline(range.from, range.to, { class: 'highlight-grammar' }));
-            });
+            const grammarRanges = findGrammarErrors(doc, grammarSuggestions);
+
+            // Combine all ranges in the correct order for layering:
+            const allRanges: Range[] = [
+              ...sentenceRanges,  // Base layer
+              ...styleRanges,     // Middle layer
+              ...grammarRanges    // Top layer
+            ];
+
+            // Create decorations from the collected ranges
+            const decorations = createDecorationsFromRanges(allRanges);
 
             return DecorationSet.create(doc, decorations);
           },
           apply: (tr, old) => {
             // If the document changed OR our custom meta flag is set, re-calculate decorations.
             if (tr.docChanged || tr.getMeta('updatedGrammarSuggestions')) {
-              const decorations: Decoration[] = [];
+              // Step 1: Collect all ranges first
+              const sentenceRanges = findLongSentences(tr.doc);
+              const styleRanges: Range[] = [
+                ...findWeakPhrases(tr.doc),
+                ...findAdverbs(tr.doc),
+                ...findPassiveVoice(tr.doc)
+              ];
 
-              // Reapply all analysis when document changes
-              const weakPhraseRanges = findWeakPhrases(tr.doc);
-              weakPhraseRanges.forEach(range => {
-                decorations.push(Decoration.inline(range.from, range.to, { class: 'hemingway-weak' }));
-              });
+              // Step 2: Add grammar error highlights
+              const grammarSuggestions = extensionThis.editor?.storage?.hemingway?.grammarSuggestions || [];
+              const grammarRanges = findGrammarErrors(tr.doc, grammarSuggestions);
 
-              const adverbRanges = findAdverbs(tr.doc);
-              adverbRanges.forEach(range => {
-                decorations.push(Decoration.inline(range.from, range.to, { class: 'hemingway-adverb' }));
-              });
+              // Combine all ranges in the correct order for layering:
+              const allRanges: Range[] = [
+                ...sentenceRanges,  // Base layer
+                ...styleRanges,     // Middle layer
+                ...grammarRanges    // Top layer
+              ];
 
-              const passiveRanges = findPassiveVoice(tr.doc);
-              passiveRanges.forEach(range => {
-                decorations.push(Decoration.inline(range.from, range.to, { class: 'hemingway-passive' }));
-              });
-
-              const longSentenceRanges = findLongSentences(tr.doc);
-              longSentenceRanges.forEach(range => {
-                const className = range.type === 'very-long-sentence'
-                  ? 'hemingway-very-long-sentence'
-                  : 'hemingway-long-sentence';
-                decorations.push(Decoration.inline(range.from, range.to, { class: className }));
-              });
-
-              // Add grammar errors from AI suggestions
-              // Safely access the editor's storage
-              const grammarSuggestions = this.editor?.storage?.hemingway?.grammarSuggestions || [];
-              const grammarErrorRanges = findGrammarErrors(tr.doc, grammarSuggestions);
-              grammarErrorRanges.forEach(range => {
-                decorations.push(Decoration.inline(range.from, range.to, { class: 'highlight-grammar' }));
-              });
+              // Create decorations from the collected ranges
+              const decorations = createDecorationsFromRanges(allRanges);
 
               return DecorationSet.create(tr.doc, decorations);
             }
