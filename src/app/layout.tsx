@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'مُحسِّن النص العربي بالذكاء الاصطناعي',
-  description: 'أداة لتحليل نصوصك، تصحيحها، وترجمتها لجعلها أكثر قوة ووضوحًا.',
+  title: 'Mutanabbi',
+  description: 'Improve your Arabic composition by writing clear and correct Arabic prose.',
 }
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />

@@ -3,8 +3,9 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { TextAnalysis, GrammarSuggestion } from '@/types';
 import { analyzeText } from '@/lib/textAnalysis';
-import { analyzeGrammar, translateText } from '@/lib/gemini';
-import { debounce, generateHighlights } from '@/utils/helpers';
+import { analyzeGrammar } from '@/lib/gemini';
+import { translateText } from '@/lib/translation';
+import { debounce, generateHighlights, setCookie, getCookie } from '@/utils/helpers';
 import { SAMPLE_TEXT } from '@/utils/constants';
 
 interface TextEditorProps {
@@ -98,7 +99,7 @@ export function TextEditor({
   );
 
   // High-priority sentence analysis
-  const analyzeJustCompletedSentence = useCallback(async (sentence: string) => {
+  const analyzeJustCompletedSentence = useCallback(async (sentence: string, previousText?: string) => {
     // Skip if AI is disabled
     if (!aiEnabled) return;
 
@@ -126,23 +127,15 @@ export function TextEditor({
 
     // Tier 1: Instant Rule-Based Analysis (always enabled)
     const newAnalysis = analyzeText(value);
-    onAnalysisChange?.(newAnalysis);
+    if (onAnalysisChange) {
+      onAnalysisChange(newAnalysis);
+    }
 
-    // Tier 2 & 3: AI Analysis (only when enabled)
+    // Tier 2 & 3: Debounced AI Analysis (if enabled)
     if (aiEnabled) {
-      // Extract and analyze recently completed sentence
-      const newChar = value.length > previousText.length ? value[value.length - 1] : null;
-      if (newChar && ['.', '؟', '!'].includes(newChar)) {
-        const sentences = value.split(/([.؟!])/g);
-        const lastSentence = sentences[sentences.length - 2] + sentences[sentences.length - 1];
-        if (lastSentence.trim().length > 5) {
-          analyzeJustCompletedSentence(lastSentence.trim());
-        }
-      }
-
-      // Full document analysis with debounce
       debouncedFullAiAnalysis(value);
-    } else if (!aiEnabled && previousText) {
+      analyzeJustCompletedSentence(value, previousText);
+    } else {
       // Clear AI suggestions when disabling
       onGrammarSuggestionsChange?.([]);
       onTranslationChange?.('...');
@@ -163,14 +156,34 @@ export function TextEditor({
     }
   };
 
-  // Initialize with sample text
+  // Initialize with saved text from cookie or sample text
   useEffect(() => {
-    handleTextChange(SAMPLE_TEXT);
+    const savedText = getCookie('editorContent');
+    if (savedText) {
+      handleTextChange(savedText);
+    } else {
+      handleTextChange(SAMPLE_TEXT);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
 
+  // Save content to cookie when the user leaves the page
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (textareaRef.current) {
+        setCookie('editorContent', textareaRef.current.value, 30); // Save for 30 days
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
+
   return (
-    <div ref={editorContainerRef} className="editor-container rounded-lg shadow-lg relative">
+    <div lang="en" dir="rtl" ref={editorContainerRef} className="editor-container rounded-lg shadow-lg relative">
       <div
         ref={highlightsRef}
         className="editor-highlights"
