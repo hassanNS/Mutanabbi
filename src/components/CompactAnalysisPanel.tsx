@@ -16,6 +16,8 @@ interface CompactAnalysisPanelProps {
   onShowAiWarning: () => void;
   isMinimized: boolean;
   onToggleMinimize: (minimized: boolean) => void;
+  apiRequestCount: number;
+  apiRequestLimit: number;
 }
 
 
@@ -30,6 +32,8 @@ export function CompactAnalysisPanel({
   onShowAiWarning,
   isMinimized,
   onToggleMinimize,
+  apiRequestCount,
+  apiRequestLimit,
 }: CompactAnalysisPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false); // For detailed AI suggestions
 
@@ -54,12 +58,14 @@ export function CompactAnalysisPanel({
   // If in minimized state, show the floating panel
   if (isMinimized) {
     return (
-      <aside className="w-full mt-4 sm:w-60 sm:shrink-0 shadow-md rounded-lg" style={{ backgroundColor: 'var(--bg-panel)' }}>
+      <aside className="w-full mt-4 sm:mt-0 sm:w-60 sm:shrink-0 shadow-md rounded-lg" style={{ backgroundColor: 'var(--bg-panel)' }}>
         <CompactAnalysisHeader
           isMinimized={isMinimized}
           isLoading={isLoading}
           aiEnabled={aiEnabled}
           handleMinimizeClick={handleMinimizeClick}
+          apiRequestCount={apiRequestCount}
+          apiRequestLimit={apiRequestLimit}
         />
         <div className="py-4 px-4 text-left text-md">
           <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
@@ -105,7 +111,7 @@ export function CompactAnalysisPanel({
 
   // Normal expanded state - integrated with flex layout
   return (
-    <aside className="w-full mt-4 sm:w-60 sm:shrink-0 shadow-md rounded-lg" style={{ backgroundColor: 'var(--bg-panel)' }}>
+    <aside className="w-full sm:w-60 sm:shrink-0 shadow-md rounded-lg h-full" style={{ backgroundColor: 'var(--bg-panel)' }}>
       <div className="h-full flex flex-col">
         {/* Header */}
         <CompactAnalysisHeader
@@ -113,6 +119,8 @@ export function CompactAnalysisPanel({
           isLoading={isLoading}
           aiEnabled={aiEnabled}
           handleMinimizeClick={handleMinimizeClick}
+          apiRequestCount={apiRequestCount}
+          apiRequestLimit={apiRequestLimit}
         />
 
         {/* Content area - more compact */}
@@ -130,7 +138,7 @@ export function CompactAnalysisPanel({
             <div className="flex items-center gap-2">
               <span className="font-bold">{aiEnabled ? grammarSuggestions.length : 0}</span>
               <button
-                className={`ml-2 text-xs px-2 py-0.5 rounded transition-colors ${aiEnabled ? 'bg-green-500 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`}
+                className={`ml-2 text-xs px-2 py-2 rounded transition-colors ${aiEnabled ? 'bg-green-500 text-white' : 'bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-300'}`}
                 onClick={(e) => {
                   e.stopPropagation();
                   if (!aiEnabled) onShowAiWarning();
@@ -145,7 +153,7 @@ export function CompactAnalysisPanel({
           {/* Expanded AI suggestions */}
           {isExpanded && aiEnabled && (
             <div className="p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-              <div className="max-h-40 overflow-y-auto ai-suggestions-scroll space-y-2">
+              <div className="ai-suggestions-scroll space-y-2">
                 {grammarSuggestions.length > 0 ? (
                   grammarSuggestions.map((item, index) => (
                     <div key={index} className="text-xs p-2 rounded border-l-2" style={{

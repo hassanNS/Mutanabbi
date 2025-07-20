@@ -140,3 +140,17 @@ export function getCookie(name: string): string | null {
   }
   return null;
 }
+
+// Helper functions for API request tracking
+export const getApiRequestCount = (): number => {
+  const count = parseInt(getCookie('apiRequestCount') || '0', 10);
+  return isNaN(count) ? 0 : count;
+};
+
+export const incrementApiRequestCount = (): number => {
+  const currentCount = getApiRequestCount();
+  const newCount = currentCount + 1;
+  setCookie('apiRequestCount', newCount.toString(), 30); // Store for 30 days
+  return newCount;
+};
+
