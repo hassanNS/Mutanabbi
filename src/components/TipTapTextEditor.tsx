@@ -208,7 +208,7 @@ export const TipTapTextEditor = ({
           {editor && <MenuBar editor={editor} />}
         </div>
       </div>
-      <div className="editor-container border-black-500 border-2 rounded-lg flex-grow relative min-h-0">
+      <div className="editor-container border-black-500 border-2 rounded-lg flex-grow relative">
           <EditorContent editor={editor} className="absolute inset-0 overflow-y-auto" />
       </div>
     </section>

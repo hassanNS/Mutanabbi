@@ -80,7 +80,7 @@ export default function Home() {
 
   return (
     <>
-      <div className="h-screen flex flex-col overflow-hidden" style={{ backgroundColor: 'var(--bg-body)' }}>
+      <div className="h-screen flex flex-col sm:overflow-hidden" style={{ backgroundColor: 'var(--bg-body)' }}>
         <header className="relative text-center justify-center py-4 flex-shrink-0">
           <div className="flex items-center justify-center">
               <div className="flex flex-col -mt-8 sm:mt-0 sm:relative sm:h-20 sm:w-36 items-center justify-center">
@@ -105,9 +105,9 @@ export default function Home() {
         </header>
 
         {/* Flex container for editor and analysis panel */}
-        <section className="w-[95%] mx-auto px-4 pb-4 flex-grow flex flex-col sm:flex-row sm:gap-4 items-stretch overflow-hidden">
+        <section className="w-[95%] mx-auto px-4 pb-4 flex-grow flex flex-col sm:flex-row sm:gap-2 items-stretch sm:overflow-hidden">
           {/* Editor takes most of the space */}
-          <div className="flex-grow w-full flex flex-col min-h-0">
+          <div className="w-full flex flex-col min-h-[50vh] sm:min-h-0 sm:flex-grow">
             <TipTapTextEditor
               analysis={analysis}
               grammarSuggestions={grammarSuggestions}
