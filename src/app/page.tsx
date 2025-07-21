@@ -10,6 +10,8 @@ import Image from 'next/image';
 import Footer from '@/components/footer';
 import BuyMeACoffeeButton from '@/components/BuyMeACoffeeButton';
 import { getApiRequestCount } from '@/utils/helpers';
+import App from 'next/app';
+import AppHeader from '@/components/AppHeader';
 
 export default function Home() {
   const [analysis, setAnalysis] = useState<TextAnalysis>({
@@ -81,33 +83,11 @@ export default function Home() {
   return (
     <>
       <div className="h-screen flex flex-col sm:overflow-hidden" style={{ backgroundColor: 'var(--bg-body)' }}>
-        <header className="relative text-center justify-center py-4 flex-shrink-0">
-          <div className="flex items-center justify-center">
-              <div className="flex flex-col -mt-8 sm:mt-0 sm:relative sm:h-20 sm:w-36 items-center justify-center">
-                <Image
-                  src="/logo.svg"
-                  alt="Mutanabbi Logo"
-                  width={112}
-                  height={112}
-                  quality={95}
-                  priority={true}
-                  className="-mb-5 sm:mb-0 sm:absolute sm:-top-8 sm:right-20 h-28 w-28 logo-image"
-                />
-                <h1 className="text-4xl font-bold sm:absolute sm:top-5 sm:left-[2.5rem]">Mutanabbi</h1>
-              </div>
-          </div>
-          <p className="text-md sm:-mt-[1rem] sm:ml-[4rem]" style={{ color: 'var(--text-subtle)'}}>
-            Improve your Arabic composition by writing clear and correct Arabic prose.
-          </p>
-          <div className="absolute top-[1.5rem] left-10">
-            <ThemeToggle />
-          </div>
-        </header>
-
+        <AppHeader />
         {/* Flex container for editor and analysis panel */}
-        <section className="w-[95%] mx-auto px-4 pb-4 flex-grow flex flex-col sm:flex-row sm:gap-2 items-stretch sm:overflow-hidden">
+        <section className="w-[95%] mx-auto mt-20 sm:mt-18 px-4 pb-4 flex-grow flex flex-col sm:flex-row sm:gap-2 items-stretch sm:overflow-hidden">
           {/* Editor takes most of the space */}
-          <div className="w-full flex flex-col min-h-[50vh] sm:min-h-0 sm:flex-grow">
+          <div className="w-full flex flex-col min-h-[55vh] sm:min-h-0 sm:flex-grow">
             <TipTapTextEditor
               analysis={analysis}
               grammarSuggestions={grammarSuggestions}
