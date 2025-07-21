@@ -5,7 +5,7 @@ import { TipTapTextEditor } from '@/components/TipTapTextEditor';
 import { CompactAnalysisPanel } from '@/components/CompactAnalysisPanel';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { AiWarningModal } from '@/components/AiWarningModal';
-import { TextAnalysis, GrammarSuggestion } from '@/types';
+import { TextAnalysis, GrammarSuggestion } from '@/types/index';
 import Image from 'next/image';
 import Footer from '@/components/footer';
 import BuyMeACoffeeButton from '@/components/BuyMeACoffeeButton';
