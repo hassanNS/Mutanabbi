@@ -26,11 +26,19 @@ export function generateHighlights(text: string, analysis: TextAnalysis, grammar
   let highlightedHtml = text;
 
   // Highlight grammar errors
-  const errorPhrases = grammarSuggestions.map(s => s.error).filter(Boolean);
+  const errorPhrases = grammarSuggestions.map(s => s.error).filter(Boolean) as string[];
   if (errorPhrases.length > 0) {
     const uniqueErrorPhrases = Array.from(new Set(errorPhrases));
     const grammarRegex = new RegExp(`(${uniqueErrorPhrases.map(escapeRegex).join('|')})`, 'g');
     highlightedHtml = highlightedHtml.replace(grammarRegex, '<span class="highlight-grammar">$&</span>');
+  }
+
+  // Highlight non-standard phrases
+  const nonStandardPhrases = grammarSuggestions.map(s => s.nonStandardPhrase).filter(Boolean) as string[];
+  if (nonStandardPhrases.length > 0) {
+    const uniqueNonStandardPhrases = Array.from(new Set(nonStandardPhrases));
+    const nonStandardRegex = new RegExp(`(${uniqueNonStandardPhrases.map(escapeRegex).join('|')})`, 'g');
+    highlightedHtml = highlightedHtml.replace(nonStandardRegex, '<span class="highlight-non-standard">$&</span>');
   }
 
   // Highlight rule-based issues

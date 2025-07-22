@@ -101,11 +101,11 @@ function GrammarSection({ count, suggestions, isLoading, aiEnabled, onToggleAi, 
               className="mb-3 p-3 rounded-lg border-r-4"
               style={{
                 backgroundColor: 'var(--suggestion-bg)',
-                borderColor: 'var(--suggestion-border)'
+                borderColor: item.error ? 'var(--suggestion-border)' : 'var(--hemingway-green)'
               }}
             >
-              <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>الخطأ:</p>
-              <p className="font-semibold text-red-500 dark:text-red-400 line-through">{item.error}</p>
+              <p className="text-sm" style={{ color: 'var(--text-subtle)' }}>{item.error ? 'الخطأ:' : 'عبارة غير قياسية:'}</p>
+              <p className="font-semibold text-red-500 dark:text-red-400 line-through">{item.error || item.nonStandardPhrase}</p>
               <p className="text-sm mt-2" style={{ color: 'var(--text-subtle)' }}>الاقتراح:</p>
               <p className="font-semibold text-green-600 dark:text-green-400">{item.suggestion}</p>
               <p className="text-xs mt-2" style={{ color: 'var(--text-subtle)' }}>{item.explanation}</p>

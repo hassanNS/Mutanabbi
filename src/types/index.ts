@@ -1,5 +1,6 @@
 export interface GrammarSuggestion {
-  error: string;
+  error?: string;
+  nonStandardPhrase?: string;
   explanation: string;
   suggestion: string;
 }

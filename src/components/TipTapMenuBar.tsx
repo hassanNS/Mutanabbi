@@ -3,7 +3,6 @@
 import type { Editor } from '@tiptap/react'
 import { useEditorState } from '@tiptap/react'
 import {
-  LuStrikethrough,
   LuPilcrow,
   LuHeading1,
   LuHeading2,
@@ -20,8 +19,6 @@ export function MenuBar({ editor }: { editor: Editor }) {
     editor,
     selector: ctx => {
       return {
-        isStrike: ctx.editor.isActive('strike'),
-        canStrike: ctx.editor.can().chain().focus().toggleStrike().run(),
         isParagraph: ctx.editor.isActive('paragraph'),
         isHeading1: ctx.editor.isActive('heading', { level: 1 }),
         isHeading2: ctx.editor.isActive('heading', { level: 2 }),
@@ -37,16 +34,6 @@ export function MenuBar({ editor }: { editor: Editor }) {
   return (
     <div className="control-group w-full">
       <div className="button-group flex justify-center flex-nowrap overflow-x-auto pb-2 gap-1 sm:gap-2">
-        <button
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          disabled={!editorState.canStrike}
-          className={`whitespace-nowrap flex-shrink-0 p-1 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${editorState.isStrike ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
-        >
-          <div className="menu-item flex flex-col sm:flex-row items-center">
-            <LuStrikethrough size={18} />
-            <span className="text-xs sm:text-sm sm:mr-1">Strike</span>
-          </div>
-        </button>
         <button
           onClick={() => editor.chain().focus().setParagraph().run()}
           className={`whitespace-nowrap flex-shrink-0 p-1 sm:p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-700 ${editorState.isParagraph ? 'bg-gray-200 dark:bg-gray-700' : ''}`}

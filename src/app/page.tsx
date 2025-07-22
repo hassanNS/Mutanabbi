@@ -82,12 +82,11 @@ export default function Home() {
 
   return (
     <>
-      <div className="h-screen flex flex-col sm:overflow-hidden" style={{ backgroundColor: 'var(--bg-body)' }}>
+      <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-body)' }}>
         <AppHeader />
         {/* Flex container for editor and analysis panel */}
-        <section className="w-[95%] mx-auto mt-20 sm:mt-18 px-4 pb-4 flex-grow flex flex-col sm:flex-row sm:gap-2 items-stretch sm:overflow-hidden">
+        <section className="min-h-[55vh] flex w-screen sm:flex-grow sm:min-h-0">
           {/* Editor takes most of the space */}
-          <div className="w-full flex flex-col min-h-[55vh] sm:min-h-0 sm:flex-grow">
             <TipTapTextEditor
               analysis={analysis}
               grammarSuggestions={grammarSuggestions}
@@ -97,30 +96,24 @@ export default function Home() {
               onLoadingChange={setIsLoading}
               aiEnabled={aiEnabled}
             />
-          </div>
-
-          {/* Analysis panel - part of the same flex container */}
-          <div className="w-full sm:w-60 flex-shrink-0 mt-4 sm:mt-0">
-            <CompactAnalysisPanel
-              analysis={analysis}
-              grammarSuggestions={grammarSuggestions}
-              translation={translation}
-              isLoading={isLoading}
-              aiEnabled={aiEnabled}
-              onToggleAi={setAiEnabled}
-              onShowAiWarning={() => setShowAiWarning(true)}
-              isMinimized={isPanelMinimized}
-              onToggleMinimize={setIsPanelMinimized}
-              apiRequestCount={apiRequestCount}
-              apiRequestLimit={apiRequestLimit}
-            />
-          </div>
         </section>
 
-        <div className="flex justify-center mb-2 mt-2 flex-shrink-0">
-          <BuyMeACoffeeButton />
+        {/* Analysis panel - part of the same flex container */}
+        <div className="h-full w-full sm:fixed right-5 top-20 sm:w-60 flex-shrink-0 mt-4 sm:mt-0 overflow-auto">
+          <CompactAnalysisPanel
+            analysis={analysis}
+            grammarSuggestions={grammarSuggestions}
+            translation={translation}
+            isLoading={isLoading}
+            aiEnabled={aiEnabled}
+            onToggleAi={setAiEnabled}
+            onShowAiWarning={() => setShowAiWarning(true)}
+            isMinimized={isPanelMinimized}
+            onToggleMinimize={setIsPanelMinimized}
+            apiRequestCount={apiRequestCount}
+            apiRequestLimit={apiRequestLimit}
+          />
         </div>
-        <Footer />
       </div>
 
       {/* AI Warning Modal */}

@@ -5,6 +5,8 @@ import { TextAnalysis, GrammarSuggestion } from '@/types';
 import { cn } from '@/utils/helpers';
 import { LuMinimize2 } from 'react-icons/lu'
 import { CompactAnalysisHeader } from './CompactAnalysisHeader';
+import BuyMeACoffeeButton from './BuyMeACoffeeButton';
+import Footer from './footer';
 
 interface CompactAnalysisPanelProps {
   analysis: TextAnalysis;
@@ -36,6 +38,9 @@ export function CompactAnalysisPanel({
   apiRequestLimit,
 }: CompactAnalysisPanelProps) {
   const [isExpanded, setIsExpanded] = useState(false); // For detailed AI suggestions
+
+  const grammarErrors = grammarSuggestions.filter(s => s.error);
+  const nonStandardPhrases = grammarSuggestions.filter(s => s.nonStandardPhrase);
 
   const handleToggleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -71,33 +76,13 @@ export function CompactAnalysisPanel({
           <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-grammar-dot)' }}></div>
             {isLoading && aiEnabled && <span className="loader-small ml-1"></span>}
-            <span style={{ color: 'var(--text-subtle)' }}>AI Suggestions:</span>
-            <span className="font-medium">{aiEnabled ? grammarSuggestions.length : 0}</span>
+            <span style={{ color: 'var(--text-subtle)' }}>Grammar/Spelling:</span>
+            <span className="font-medium">{aiEnabled ? grammarErrors.length : 0}</span>
           </div>
-          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-long-dot)' }}></div>
-            <span style={{ color: 'var(--text-subtle)' }}>Long:</span>
-            <span className="font-medium">{analysis.longSentenceCount}</span>
-          </div>
-          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-verylong-dot)' }}></div>
-            <span style={{ color: 'var(--text-subtle)' }}>VLong:</span>
-            <span className="font-medium">{analysis.veryLongSentenceCount}</span>
-          </div>
-          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-adverb-dot)' }}></div>
-            <span style={{ color: 'var(--text-subtle)' }}>Adverbs:</span>
-            <span className="font-medium">{analysis.adverbCount}</span>
-          </div>
-          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-passive-dot)' }}></div>
-            <span style={{ color: 'var(--text-subtle)' }}>Passive:</span>
-            <span className="font-medium">{analysis.passiveCount}</span>
-          </div>
-          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity">
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--panel-weak-dot)' }}></div>
-            <span style={{ color: 'var(--text-subtle)' }}>Weak:</span>
-            <span className="font-medium">{analysis.weakPhraseCount}</span>
+          <div className="flex items-center justify-left gap-2 hover:opacity-75 transition-opacity mt-2">
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: 'var(--hemingway-weak-dot)' }}></div>
+            <span style={{ color: 'var(--text-subtle)' }}>Non-Standard:</span>
+            <span className="font-medium">{aiEnabled ? nonStandardPhrases.length : 0}</span>
           </div>
           <div className="hover:opacity-75 transition-opacity mt-4 pt-2 border-t text-center" style={{ borderColor: 'var(--border-color)' }}>
             <div style={{ color: 'var(--text-subtle)' }}>
@@ -111,8 +96,8 @@ export function CompactAnalysisPanel({
 
   // Normal expanded state - integrated with flex layout
   return (
-    <aside className="w-full sm:w-60 sm:shrink-0 shadow-md rounded-lg h-full" style={{ backgroundColor: 'var(--bg-panel)' }}>
-      <div className="h-full flex flex-col">
+    <aside>
+      <div className="w-full flex flex-col sm:w-60 sm:shrink-0 shadow-md bg-slate-200 dark:bg-slate-700">
         {/* Header */}
         <CompactAnalysisHeader
           isMinimized={isMinimized}
@@ -156,16 +141,29 @@ export function CompactAnalysisPanel({
               <div className="ai-suggestions-scroll space-y-2">
                 {grammarSuggestions.length > 0 ? (
                   grammarSuggestions.map((item, index) => (
-                    <div key={index} className="text-xs p-2 rounded border-l-2" style={{
-                      backgroundColor: 'var(--suggestion-bg)',
-                      borderColor: 'var(--panel-grammar-dot)'
-                    }}>
-                      <div className="space-y-1" dir="ltr">
-                        <div className="font-medium text-red-500 line-through text-right" dir="ltr">{item.error}</div>
-                        <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="ltr">{item.explanation}</div>
-                        <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
+                    item.error ? (
+                      <div key={index} className="text-xs p-2 rounded border-l-2" style={{
+                        backgroundColor: 'var(--suggestion-bg)',
+                        borderColor: 'var(--panel-grammar-dot)'
+                      }}>
+                        <div className="space-y-1" dir="ltr">
+                          <div className="font-medium text-red-500 line-through text-right" dir="ltr">{item.error}</div>
+                          <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="ltr">{item.explanation}</div>
+                          <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
+                        </div>
                       </div>
-                    </div>
+                    ) : item.nonStandardPhrase ? (
+                      <div key={index} className="text-xs p-2 rounded border-l-2" style={{
+                        backgroundColor: 'var(--suggestion-bg)',
+                        borderColor: 'var(--hemingway-green)'
+                      }}>
+                        <div className="space-y-1" dir="ltr">
+                          <div className="font-medium text-yellow-600 dark:text-yellow-400 line-through text-right" dir="ltr">{item.nonStandardPhrase}</div>
+                          <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="ltr">{item.explanation}</div>
+                          <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
+                        </div>
+                      </div>
+                    ) : null
                   ))
                 ) : (
                   <div className="text-xs italic" style={{ color: 'var(--text-subtle)' }}>
@@ -176,46 +174,15 @@ export function CompactAnalysisPanel({
             </div>
           )}
 
-          {/* Readability metrics */}
-          <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--panel-long-dot)' }}></div>
-              <span className="font-medium">Long Sentences</span>
+          {isExpanded && aiEnabled && (
+            <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--panel-weak-dot)' }}></div>
+                <span className="font-medium">Non-Standard Phrases</span>
+              </div>
+              <span className="font-bold">{nonStandardPhrases.length}</span>
             </div>
-            <span className="font-bold">{analysis.longSentenceCount}</span>
-          </div>
-
-          <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--panel-verylong-dot)' }}></div>
-              <span className="font-medium">Very Long</span>
-            </div>
-            <span className="font-bold">{analysis.veryLongSentenceCount}</span>
-          </div>
-
-          <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--panel-adverb-dot)' }}></div>
-              <span className="font-medium">Adverbs</span>
-            </div>
-            <span className="font-bold">{analysis.adverbCount}</span>
-          </div>
-
-          <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--panel-passive-dot)' }}></div>
-              <span className="font-medium">Passive Voice</span>
-            </div>
-            <span className="font-bold">{analysis.passiveCount}</span>
-          </div>
-
-          <div className="flex justify-between items-center p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--panel-weak-dot)' }}></div>
-              <span className="font-medium">Weak Phrases</span>
-            </div>
-            <span className="font-bold">{analysis.weakPhraseCount}</span>
-          </div>
+          )}
 
           {/* Statistics in a more compact form */}
           <div className="p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
@@ -245,6 +212,12 @@ export function CompactAnalysisPanel({
             </div>
           )}
         </div>
+      </div>
+      <div className="flex flex-col justify-center items-center px-2 py-2">
+        <div className="mt-2 mb-2">
+          <BuyMeACoffeeButton/>
+        </div>
+        <Footer/>
       </div>
     </aside>
   );

@@ -32,18 +32,6 @@ export function CompactAnalysisHeader({
           {isLoading && aiEnabled && (
             <span className="loader-small mr-1"></span>
           )}
-          <button
-            onClick={handleMinimizeClick}
-            className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            title="Minimize panel"
-          >
-            {isMinimized ? (
-              <LuExpand className="w-4 h-4" />
-            )
-            : (
-              <LuMinimize2 className="w-4 h-4" />
-            )}
-          </button>
       </div>
     </div>
   )

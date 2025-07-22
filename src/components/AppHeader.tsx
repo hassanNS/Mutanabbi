@@ -5,7 +5,7 @@ import { ThemeToggle } from '@/components/ThemeToggle'
 
 export default function AppHeader() {
   return (
-          <header className="w-full fixed left-0 z-10 top-0 shadow-md" style={{ backgroundColor: 'var(--bg-body)' }}>
+      <header className="w-full fixed left-0 top-0 shadow-md bg-slate-200 dark:bg-slate-700">
         <div className="flex flex-row justify-between items-center w-full h-14 px-4">
           <div className="flex items-center">
             <div className="flex items-center mr-2">
