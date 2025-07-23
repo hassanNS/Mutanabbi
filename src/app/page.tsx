@@ -32,7 +32,7 @@ export default function Home() {
   const [grammarSuggestions, setGrammarSuggestions] = useState<GrammarSuggestion[]>([]);
   const [translation, setTranslation] = useState('...');
   const [isLoading, setIsLoading] = useState(false);
-  const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(true);
   const [showAiWarning, setShowAiWarning] = useState(false);
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
   const [apiRequestCount, setApiRequestCount] = useState(0);
@@ -42,23 +42,19 @@ export default function Home() {
 
   // Load API request count when component mounts or AI is enabled
   useEffect(() => {
-    if (aiEnabled) {
-      const count = getApiRequestCount();
-      setApiRequestCount(count);
-    }
-  }, [aiEnabled]);
+    const count = getApiRequestCount();
+    setApiRequestCount(count);
+  });
 
   // Update the API request count at regular intervals when AI is enabled
   useEffect(() => {
-    if (!aiEnabled) return;
-
     const intervalId = setInterval(() => {
       const count = getApiRequestCount();
       setApiRequestCount(count);
-    }, 10000); // Check every 10 seconds
+    }, 5000); // Check every 5 seconds
 
     return () => clearInterval(intervalId);
-  }, [aiEnabled]);
+  });
 
   // Handle functional updates to grammar suggestions
   const handleGrammarSuggestionsChange = (suggestionsOrUpdater: GrammarSuggestion[] | ((prev: GrammarSuggestion[]) => GrammarSuggestion[])) => {
@@ -69,25 +65,14 @@ export default function Home() {
     }
   };
 
-  // Handle AI warning confirmation
-  const handleAiWarningConfirm = () => {
-    setShowAiWarning(false);
-    setAiEnabled(true);
-  };
-
-  // Handle AI warning dismissal
-  const handleAiWarningDismiss = () => {
-    setShowAiWarning(false);
-  };
 
   return (
     <>
-      <div className="h-screen flex flex-col sm:overflow-hidden" style={{ backgroundColor: 'var(--bg-body)' }}>
+      <div className="h-screen flex flex-col" style={{ backgroundColor: 'var(--bg-body)' }}>
         <AppHeader />
         {/* Flex container for editor and analysis panel */}
-        <section className="w-[95%] mx-auto mt-20 sm:mt-18 px-4 pb-4 flex-grow flex flex-col sm:flex-row sm:gap-2 items-stretch sm:overflow-hidden">
+        <section className="min-h-[55vh] flex w-screen sm:flex-grow sm:min-h-0">
           {/* Editor takes most of the space */}
-          <div className="w-full flex flex-col min-h-[55vh] sm:min-h-0 sm:flex-grow">
             <TipTapTextEditor
               analysis={analysis}
               grammarSuggestions={grammarSuggestions}
@@ -95,41 +80,25 @@ export default function Home() {
               onGrammarSuggestionsChange={handleGrammarSuggestionsChange}
               onTranslationChange={setTranslation}
               onLoadingChange={setIsLoading}
-              aiEnabled={aiEnabled}
             />
-          </div>
-
-          {/* Analysis panel - part of the same flex container */}
-          <div className="w-full sm:w-60 flex-shrink-0 mt-4 sm:mt-0">
-            <CompactAnalysisPanel
-              analysis={analysis}
-              grammarSuggestions={grammarSuggestions}
-              translation={translation}
-              isLoading={isLoading}
-              aiEnabled={aiEnabled}
-              onToggleAi={setAiEnabled}
-              onShowAiWarning={() => setShowAiWarning(true)}
-              isMinimized={isPanelMinimized}
-              onToggleMinimize={setIsPanelMinimized}
-              apiRequestCount={apiRequestCount}
-              apiRequestLimit={apiRequestLimit}
-            />
-          </div>
         </section>
 
-        <div className="flex justify-center mb-2 mt-2 flex-shrink-0">
-          <BuyMeACoffeeButton />
+        {/* Analysis panel - part of the same flex container */}
+        <div className="h-full w-full sm:fixed right-5 top-20 sm:w-60 flex-shrink-0 mt-4 sm:mt-0 overflow-auto">
+          <CompactAnalysisPanel
+            analysis={analysis}
+            grammarSuggestions={grammarSuggestions}
+            translation={translation}
+            isLoading={isLoading}
+            onToggleAi={setAiEnabled}
+            onShowAiWarning={() => setShowAiWarning(true)}
+            isMinimized={isPanelMinimized}
+            onToggleMinimize={setIsPanelMinimized}
+            apiRequestCount={apiRequestCount}
+            apiRequestLimit={apiRequestLimit}
+          />
         </div>
-        <Footer />
       </div>
-
-      {/* AI Warning Modal */}
-      {showAiWarning && (
-        <AiWarningModal
-          onConfirm={handleAiWarningConfirm}
-          onDismiss={handleAiWarningDismiss}
-        />
-      )}
     </>
   );
 }
