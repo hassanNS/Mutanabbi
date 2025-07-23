@@ -202,7 +202,7 @@ export const TipTapTextEditor = ({
   }
 
   return (
-    <section className="w-full flex flex-col justify-center mt-20">
+    <section className="w-full flex flex-col mt-20">
       <div className="fixed w-full top-[4rem]">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center flex-shrink-0">
           <MenuBar editor={editor} />

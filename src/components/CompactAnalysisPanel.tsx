@@ -138,7 +138,7 @@ export function CompactAnalysisPanel({
           {/* Expanded AI suggestions */}
           {isExpanded && aiEnabled && (
             <div className="p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
-              <div className="ai-suggestions-scroll space-y-2">
+              <div className="ai-suggestions-scroll space-y-2 max-h-[200px] overflow-auto">
                 {grammarSuggestions.length > 0 ? (
                   grammarSuggestions.map((item, index) => (
                     item.error ? (
