@@ -120,14 +120,21 @@ export function normalizeArabicText(text: string): string {
  * @param days - The number of days until the cookie expires.
  */
 export function setCookie(name: string, value: string, days: number) {
-  let expires = "";
-  if (days) {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "; expires=" + date.toUTCString();
+  try {
+    let expires = "";
+    if (days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = "; expires=" + date.toUTCString();
+    }
+
+    // Encode the value to handle special characters
+    const encodedValue = encodeURIComponent(value);
+
+    document.cookie = name + "=" + encodedValue + expires + "; path=/; SameSite=Lax";
+  } catch (error) {
+    console.error('Error setting cookie:', error);
   }
-  // Ensure the value is URI encoded to handle special characters
-  document.cookie = name + "=" + (encodeURIComponent(value) || "")  + expires + "; path=/; SameSite=Lax";
 }
 
 /**
@@ -136,17 +143,23 @@ export function setCookie(name: string, value: string, days: number) {
  * @returns The cookie value or null if not found.
  */
 export function getCookie(name: string): string | null {
-  const nameEQ = name + "=";
-  const ca = document.cookie.split(';');
-  for(let i=0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) {
-      // Decode the cookie value
-      return decodeURIComponent(c.substring(nameEQ.length, c.length));
+  try {
+    const nameEQ = name + "=";
+    const ca = document.cookie.split(';');
+    for(let i=0; i < ca.length; i++) {
+      let c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) {
+        // Get the raw value and decode it
+        const rawValue = c.substring(nameEQ.length, c.length);
+        return decodeURIComponent(rawValue);
+      }
     }
+    return null;
+  } catch (error) {
+    console.error('Error getting cookie:', error);
+    return null;
   }
-  return null;
 }
 
 // Helper functions for API request tracking
@@ -158,7 +171,6 @@ export const getApiRequestCount = (): number => {
 export const incrementApiRequestCount = (): number => {
   const currentCount = getApiRequestCount();
   const newCount = currentCount + 1;
-  setCookie('apiRequestCount', newCount.toString(), 30); // Store for 30 days
+  setCookie('apiRequestCount', newCount.toString(), 10); // Store for 10 days
   return newCount;
 };
-

@@ -32,7 +32,7 @@ export default function Home() {
   const [grammarSuggestions, setGrammarSuggestions] = useState<GrammarSuggestion[]>([]);
   const [translation, setTranslation] = useState('...');
   const [isLoading, setIsLoading] = useState(false);
-  const [aiEnabled, setAiEnabled] = useState(false);
+  const [aiEnabled, setAiEnabled] = useState(true);
   const [showAiWarning, setShowAiWarning] = useState(false);
   const [isPanelMinimized, setIsPanelMinimized] = useState(false);
   const [apiRequestCount, setApiRequestCount] = useState(0);
@@ -42,23 +42,19 @@ export default function Home() {
 
   // Load API request count when component mounts or AI is enabled
   useEffect(() => {
-    if (aiEnabled) {
-      const count = getApiRequestCount();
-      setApiRequestCount(count);
-    }
-  }, [aiEnabled]);
+    const count = getApiRequestCount();
+    setApiRequestCount(count);
+  });
 
   // Update the API request count at regular intervals when AI is enabled
   useEffect(() => {
-    if (!aiEnabled) return;
-
     const intervalId = setInterval(() => {
       const count = getApiRequestCount();
       setApiRequestCount(count);
-    }, 10000); // Check every 10 seconds
+    }, 5000); // Check every 5 seconds
 
     return () => clearInterval(intervalId);
-  }, [aiEnabled]);
+  });
 
   // Handle functional updates to grammar suggestions
   const handleGrammarSuggestionsChange = (suggestionsOrUpdater: GrammarSuggestion[] | ((prev: GrammarSuggestion[]) => GrammarSuggestion[])) => {
@@ -69,16 +65,6 @@ export default function Home() {
     }
   };
 
-  // Handle AI warning confirmation
-  const handleAiWarningConfirm = () => {
-    setShowAiWarning(false);
-    setAiEnabled(true);
-  };
-
-  // Handle AI warning dismissal
-  const handleAiWarningDismiss = () => {
-    setShowAiWarning(false);
-  };
 
   return (
     <>
@@ -94,7 +80,6 @@ export default function Home() {
               onGrammarSuggestionsChange={handleGrammarSuggestionsChange}
               onTranslationChange={setTranslation}
               onLoadingChange={setIsLoading}
-              aiEnabled={aiEnabled}
             />
         </section>
 
@@ -105,7 +90,6 @@ export default function Home() {
             grammarSuggestions={grammarSuggestions}
             translation={translation}
             isLoading={isLoading}
-            aiEnabled={aiEnabled}
             onToggleAi={setAiEnabled}
             onShowAiWarning={() => setShowAiWarning(true)}
             isMinimized={isPanelMinimized}
@@ -115,14 +99,6 @@ export default function Home() {
           />
         </div>
       </div>
-
-      {/* AI Warning Modal */}
-      {showAiWarning && (
-        <AiWarningModal
-          onConfirm={handleAiWarningConfirm}
-          onDismiss={handleAiWarningDismiss}
-        />
-      )}
     </>
   );
 }

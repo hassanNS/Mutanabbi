@@ -29,7 +29,6 @@ interface TipTapTextEditorProps {
   onGrammarSuggestionsChange?: (suggestions: GrammarSuggestion[] | ((prev: GrammarSuggestion[]) => GrammarSuggestion[])) => void;
   onTranslationChange?: (translation: string) => void;
   onLoadingChange?: (isLoading: boolean) => void;
-  aiEnabled: boolean;
 }
 
 // Named component export
@@ -40,7 +39,6 @@ export const TipTapTextEditor = ({
   onGrammarSuggestionsChange,
   onTranslationChange,
   onLoadingChange,
-  aiEnabled
 }: TipTapTextEditorProps) => {
   // AbortController to manage API requests
   const fullAnalysisControllerRef = useRef<AbortController | null>(null);
@@ -71,17 +69,10 @@ export const TipTapTextEditor = ({
         onAnalysisChange(newAnalysis);
       }
 
-      // Save content to cookie
-      setCookie('editorContent', editor.getHTML(), 30);
+      // Save content to cookie (10 days)
+      setCookie('editorContent', editor.getHTML(), 10);
 
-      // Tier 2 & 3: Debounced AI Analysis (if enabled)
-      if (aiEnabled) {
-        debouncedFullAiAnalysis(content);
-      } else {
-        // Clear AI suggestions when disabling
-        onGrammarSuggestionsChange?.([]);
-        onTranslationChange?.('...');
-      }
+      // No longer run AI analysis on text change
     },
     // Fix the SSR issue by setting immediatelyRender to false
     immediatelyRender: false,
@@ -89,16 +80,7 @@ export const TipTapTextEditor = ({
 
   // Full document analysis (for translation and consistency)
   const performFullAiAnalysis = useCallback(async (inputText: string, signal: AbortSignal) => {
-    // Don't perform AI analysis if it's disabled
-    if (!aiEnabled) {
-      onGrammarSuggestionsChange?.([]);
-      onTranslationChange?.('...');
-      if (editor) {
-        editor.chain().clearGrammarHighlights().run();
-      }
-      return;
-    }
-
+    // Don't perform AI analysis if it's disabled or empty
     const trimmedText = inputText.trim();
     if (trimmedText.length < 10) {
       onGrammarSuggestionsChange?.([]);
@@ -149,40 +131,71 @@ export const TipTapTextEditor = ({
         onLoadingChange?.(false);
       }
     }
-  }, [onGrammarSuggestionsChange, onTranslationChange, onLoadingChange, aiEnabled, editor]);
+  }, [onGrammarSuggestionsChange, onTranslationChange, onLoadingChange, editor]);
 
-  // Debounced version of the full analysis
-  const debouncedFullAiAnalysis = useCallback(
-    debounce((currentText: string) => {
-      // Cancel any previous full analysis before starting a new one
+  // This will be called when the user clicks the analysis button
+  const handleAnalysisButtonClick = useCallback(() => {
+    if (editor) {
+      const content = editor.getText();
+
+      // Cancel any previous analysis
       if (fullAnalysisControllerRef.current) {
         fullAnalysisControllerRef.current.abort();
       }
+
       // Create a new controller for the new request
       fullAnalysisControllerRef.current = new AbortController();
-      performFullAiAnalysis(currentText, fullAnalysisControllerRef.current.signal);
-    }, 1500), // A slightly longer debounce for the full sync
-    [performFullAiAnalysis]
-  );
+      performFullAiAnalysis(content, fullAnalysisControllerRef.current.signal);
+    }
+  }, [editor, performFullAiAnalysis]);
 
   // Initialize with saved text from cookie or sample text
   useEffect(() => {
     if (editor) {
-      const savedText = getCookie('editorContent');
-      if (savedText) {
-        editor.commands.setContent(savedText);
-      } else {
-        editor.commands.setContent(SAMPLE_TEXT);
-      }
+      try {
+        const savedText = getCookie('editorContent');
+        if (savedText && savedText.trim().length > 0) {
+          editor.commands.setContent(savedText);
+          console.log('Loaded content from cookie');
+        } else {
+          editor.commands.setContent(SAMPLE_TEXT);
+          console.log('Using sample text');
+        }
 
-      // Initial analysis
-      const content = editor.getText();
-      const newAnalysis = analyzeText(content);
-      if (onAnalysisChange) {
-        onAnalysisChange(newAnalysis);
+        // Initial analysis
+        const content = editor.getText();
+        const newAnalysis = analyzeText(content);
+        if (onAnalysisChange) {
+          onAnalysisChange(newAnalysis);
+        }
+      } catch (error) {
+        console.error('Error loading saved content:', error);
+        editor.commands.setContent(SAMPLE_TEXT);
       }
     }
   }, [editor, onAnalysisChange]);
+
+  // Save content when the user leaves the page
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (editor) {
+        setCookie('editorContent', editor.getHTML(), 10); // Save for 10 days
+      }
+    };
+
+    // Add event listener for page unload
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      // Clean up the event listener
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+
+      // Also save when component unmounts
+      if (editor) {
+        setCookie('editorContent', editor.getHTML(), 10);
+      }
+    };
+  }, [editor]);
 
   // Update grammar suggestions when they change
   useEffect(() => {
@@ -191,6 +204,23 @@ export const TipTapTextEditor = ({
       editor.commands.updateGrammarSuggestions(grammarSuggestions);
     }
   }, [editor, grammarSuggestions]);
+
+  // Export the analyze function so it can be called from outside
+  useEffect(() => {
+    // Make the analysis function available to the parent component
+    if (typeof window !== 'undefined') {
+      // @ts-ignore
+      window.requestAiAnalysis = handleAnalysisButtonClick;
+    }
+
+    return () => {
+      // Clean up
+      if (typeof window !== 'undefined') {
+        // @ts-ignore
+        delete window.requestAiAnalysis;
+      }
+    };
+  }, [handleAnalysisButtonClick]);
 
   // Only render the editor when component has mounted (client-side only)
   if (!isMounted) {
