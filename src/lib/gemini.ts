@@ -7,8 +7,8 @@ import { getApiRequestCount, incrementApiRequestCount } from '@/utils/helpers';
 const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 const apiUrl = process.env.NEXT_PUBLIC_GEMINI_API_URL;
 const apiPostfix = process.env.NEXT_PUBLIC_GEMINI_API_URL_POST_FIX;
-const grammarModelName = process.env.NEXT_PUBLIC_GEMINI_MODEL || "gemini-1.5-flash";
-const temperature = parseFloat(process.env.NEXT_PUBLIC_GEMINI_MODEL_TEMPERATURE || "0.5");
+const grammarModelName = process.env.NEXT_PUBLIC_GEMINI_MODEL || "gemini-2.0-flash";
+const temperature = parseFloat(process.env.NEXT_PUBLIC_GEMINI_MODEL_TEMPERATURE || "0.8");
 const apiRequestLimit = parseInt(process.env.NEXT_PUBLIC_API_REQUEST_LIMIT || "300", 10);
 
 if (!apiKey || !apiUrl || !apiPostfix) {
