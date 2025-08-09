@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { TextAnalysis, GrammarSuggestion } from '@/types';
 import { cn } from '@/utils/helpers';
-import { LuMinimize2 } from 'react-icons/lu'
+import { LuChevronDown, LuMinimize2 } from 'react-icons/lu'
 import { BsLightningChargeFill } from 'react-icons/bs';
 import { CompactAnalysisHeader } from './CompactAnalysisHeader';
 import BuyMeACoffeeButton from './BuyMeACoffeeButton';
@@ -38,6 +38,8 @@ export function CompactAnalysisPanel({
   const [isExpandedNP, setIsExpandedNP] = useState(false); // For detailed non-standard phrases
 
   const grammarErrors = grammarSuggestions.filter(s => s.error);
+  const nonStandardPhrases = grammarSuggestions.filter(s => s.nonStandardPhrase);
+  console.log('nonStandardPhrases', nonStandardPhrases);
 
   // Function to trigger AI analysis
   const handleAnalyzeClick = () => {
@@ -102,7 +104,12 @@ export function CompactAnalysisPanel({
               <span className="font-medium">AI Suggestions</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-bold">{grammarSuggestions.length}</span>
+              <span className="font-bold">{grammarErrors.length}</span>
+            </div>
+            <div>
+                <LuChevronDown
+                className={`h-4 w-4 transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                />
             </div>
           </div>
 
@@ -110,20 +117,64 @@ export function CompactAnalysisPanel({
           {isExpanded && (
             <div className="p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
               <div className="ai-suggestions-scroll space-y-2 max-h-[200px] overflow-auto">
-                {grammarSuggestions.length > 0 ? (
-                  grammarSuggestions.map((item, index) => (
-                    item.error ? (
-                      <div key={index} className="text-xs p-2 rounded border-l-2" style={{
-                        backgroundColor: 'var(--suggestion-bg)',
-                        borderColor: 'var(--panel-grammar-dot)'
-                      }}>
-                        <div className="space-y-1" dir="ltr">
-                          <div className="font-medium text-red-500 line-through text-right" dir="ltr">{item.error}</div>
-                          <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="ltr">{item.explanation}</div>
-                          <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
-                        </div>
+                {grammarErrors.length > 0 ? (
+                  grammarErrors.map((item, index) => (
+                    <div key={index} className="text-xs p-2 rounded border-l-2" style={{
+                      backgroundColor: 'var(--suggestion-bg)',
+                      borderColor: 'var(--panel-grammar-dot)'
+                    }}>
+                      <div className="space-y-1" dir="ltr">
+                        <div className="font-medium text-red-500 line-through text-right" dir="ltr">{item.error}</div>
+                        <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="ltr">{item.explanation}</div>
+                        <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
                       </div>
-                    ): null
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-xs italic" style={{ color: 'var(--text-subtle)' }}>
+                    {isLoading ? 'Analyzing...' : 'Click "Check" to get suggestions'}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Non-Standard Phrases Section */}
+          <div
+            className="flex justify-between items-center p-3 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-b"
+            style={{ borderColor: 'var(--border-color)' }}
+            onClick={handleExpandNPhrases}
+          >
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--panel-weak-dot)' }}></div>
+              <span className="font-medium">Non-Standard Phrases</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold">{nonStandardPhrases.length}</span>
+            </div>
+            <div>
+              <LuChevronDown
+                className={`h-4 w-4 transform transition-transform ${isExpandedNP ? 'rotate-180' : ''}`}
+              />
+            </div>
+          </div>
+
+          {/* Expanded Non-Standard Phrases */}
+          {isExpandedNP && (
+            <div className="p-3 border-b" style={{ borderColor: 'var(--border-color)' }}>
+              <div className="ai-suggestions-scroll space-y-2 max-h-[200px] overflow-auto">
+                {nonStandardPhrases.length > 0 ? (
+                  nonStandardPhrases.map((item, index) => (
+                    <div key={index} className="text-xs p-2 rounded border-l-2" style={{
+                      backgroundColor: 'var(--suggestion-bg)',
+                      borderColor: 'var(--panel-grammar-dot)'
+                    }}>
+                      <div className="space-y-1" dir="ltr">
+                        <div className="font-medium text-orange-500 text-right" dir="ltr">{item.nonStandardPhrase}</div>
+                        <div className="text-xs italic text-gray-500 dark:text-gray-400 mt-1 text-right" dir="ltr">{item.explanation}</div>
+                        <div className="text-green-600 dark:text-green-400 font-medium text-right" dir="rtl">{item.suggestion}</div>
+                      </div>
+                    </div>
                   ))
                 ) : (
                   <div className="text-xs italic" style={{ color: 'var(--text-subtle)' }}>
