@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Analytics } from '@vercel/analytics/next'
+import { ClerkProvider } from '@clerk/nextjs'
 
 export const metadata: Metadata = {
   title: 'Mutanabbi',
@@ -13,18 +14,20 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg"></link>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400..700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet" />
-        <Analytics/>
-      </head>
-      <body>
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html>
+        <head>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="icon" type="image/svg+xml" href="/favicon.svg"></link>
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+          <link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400..700&display=swap" rel="stylesheet" />
+          <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet" />
+          <Analytics/>
+        </head>
+        <body>
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
