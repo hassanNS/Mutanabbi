@@ -3,14 +3,9 @@
 import { useState, useEffect } from 'react';
 import { TipTapTextEditor } from '@/components/TipTapTextEditor';
 import { CompactAnalysisPanel } from '@/components/CompactAnalysisPanel';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { AiWarningModal } from '@/components/AiWarningModal';
 import { TextAnalysis, GrammarSuggestion } from '@/types/index';
-import Image from 'next/image';
-import Footer from '@/components/footer';
-import BuyMeACoffeeButton from '@/components/BuyMeACoffeeButton';
 import { getApiRequestCount } from '@/utils/helpers';
-import App from 'next/app';
+import { initializeContextCache } from '@/lib/gemini';
 import AppHeader from '@/components/AppHeader';
 
 export default function Home() {
@@ -39,6 +34,11 @@ export default function Home() {
 
   // Get the API request limit from environment variable
   const apiRequestLimit = parseInt(process.env.NEXT_PUBLIC_API_REQUEST_LIMIT || '300', 10);
+
+  // Initialize context cache when component mounts
+  useEffect(() => {
+    initializeContextCache();
+  }, []);
 
   // Load API request count when component mounts or AI is enabled
   useEffect(() => {
